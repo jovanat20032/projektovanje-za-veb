@@ -11,4 +11,5 @@ export class Objekat {
     lajkovi = 0;
     dislajkovi = 0;
     status = "";
+    sport?: string;
 }

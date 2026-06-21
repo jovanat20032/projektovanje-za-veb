@@ -1,0 +1,63 @@
+@if (objekat) {
+  <div class="container">
+    <button (click)="nazad()">← Nazad na početnu</button>
+    
+    <h2>{{ objekat.naziv }}</h2>
+    <hr>
+
+    <div class="osnovni-podaci">
+      <p><strong>Grad:</strong> {{ objekat.grad }}</p>
+      <p><strong>Adresa:</strong> {{ objekat.adresa }}</p>
+      <p><strong>Cena po satu:</strong> {{ objekat.cenaPoSatu }} RSD</p>
+      <p>
+        <strong>Reakcije:</strong> 
+        <span style="color: green;"> lajkovi {{ objekat.lajkovi }}</span> | 
+        <span style="color: red;">dislajkovi {{ objekat.dislajkovi }}</span>
+      </p>
+    </div>
+
+    <hr>
+
+    <h3>Lista dostupnih terena/hala</h3>
+    @if (tereni.length > 0) {
+      <table border="1" cellpadding="5">
+        <thead>
+          <tr>
+            <th>Naziv</th>
+            <th>Tip</th>
+            <th>Kapacitet</th>
+            <th>Opis opreme</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (teren of tereni; track teren.id) {
+            <tr>
+              <td>{{ teren.naziv }}</td>
+              <td>{{ teren.tip }}</td>
+              <td>{{ teren.kapacitet }}</td>
+              <td>{{ teren.opisOpreme ? teren.opisOpreme : '-' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <p>Ovaj objekat trenutno nema unetih terena.</p>
+    }
+
+    <hr>
+
+    <h3>Galerija slika</h3>
+    <div class="galerija">
+      @if (galerija.length > 0) {
+        @for (slika of galerija; track slika) {
+          <img [src]="'assets/' + slika" alt="Slika objekta" 
+               style="height: 200px; margin-right: 15px; border-radius: 8px; box-shadow: 2px 2px 8px rgba(0,0,0,0.2);">
+        }
+      } @else {
+        <p>Ovaj objekat trenutno nema dodatih slika.</p>
+      }
+    </div>
+  </div>
+} @else {
+  <p>Učitavanje podataka o objektu...</p>
+}

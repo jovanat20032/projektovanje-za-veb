@@ -13,11 +13,18 @@ public class Objekat {
     private int lajkovi;
     private int dislajkovi;
     private String status;
+    private String sport;
     public int getId() {
         return id;
     }
+    public String getSport() {
+        return sport;
+    }
+    public void setSport(String sport) {
+        this.sport = sport;
+    }
     public Objekat(int id, String naziv, String grad, String adresa, String maticniBroj, String pib, double cenaPoSatu,
-            String radnoVreme, int dozvoljeniMinusi, int lajkovi, int dislajkovi, String status) {
+            String radnoVreme, int dozvoljeniMinusi, int lajkovi, int dislajkovi, String status, String sport) {
         this.id = id;
         this.naziv = naziv;
         this.grad = grad;
@@ -30,7 +37,9 @@ public class Objekat {
         this.lajkovi = lajkovi;
         this.dislajkovi = dislajkovi;
         this.status = status;
+        this.sport = sport;
     }
+    public Objekat(){}
     public void setId(int id) {
         this.id = id;
     }
