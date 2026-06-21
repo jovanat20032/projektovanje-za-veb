@@ -1,0 +1,21 @@
+<h2>Zaboravljena lozinka</h2>
+<p>Unesite Vaše korisničko ime ili email adresu kako biste dobili link za promenu lozinke.</p>
+<hr />
+
+<input type="text" [(ngModel)]="unos" placeholder="Korisničko ime ili email" style="width: 250px;">
+<br><br>
+<button (click)="posaljiZahtev()">Pošalji link</button>
+
+<br><br>
+<span style="color: red">{{ poruka }}</span>
+
+@if (dobijeniLink) {
+    <div style="margin-top: 20px; padding: 15px; border: 1px dashed blue; background: #f0f8ff;">
+        <b>Simulacija prijemnog Inbox-a:</b><br><br>
+        Dobili ste novi zahtev za promenu lozinke. Kliknite na link ispod (važi 30 minuta):<br>
+        <a [href]="dobijeniLink">{{ dobijeniLink }}</a>
+    </div>
+}
+
+<br><br>
+<button click="nazadPrijava()">Nazad na prijavu</button>

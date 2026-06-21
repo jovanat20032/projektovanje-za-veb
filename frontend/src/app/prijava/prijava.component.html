@@ -1,0 +1,28 @@
+<h2>Prijava na sistem</h2>
+<hr />
+<form>
+    <table>
+        <tr>
+            <td>Korisničko ime:</td>
+            <td>
+                <input type='text' name='korisnickoIme' [(ngModel)]='korisnickoIme'>
+            </td>
+        </tr>
+        <tr>
+            <td>Lozinka:</td>
+            <td>
+                <input type='password' name='lozinka' [(ngModel)]='lozinka'>
+            </td>
+        </tr>
+        <tr>
+            <td colspan='2'>
+                <input type='button' value='Prijava' (click)='prijavaNaSistem()'>
+            </td>
+        </tr>
+    </table>
+</form>
+<span style="color: red">{{poruka}}</span>
+<br>
+Nemate nalog? <input type="button" value="Registracija" (click)='registracija()'>
+<br><br>
+Zaboravili ste lozinku? <input type="button" value="Zaboravljena lozinka" (click)='zaboravljena()'>
