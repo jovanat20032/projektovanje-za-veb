@@ -1,0 +1,126 @@
+<div class="container">
+  <nav class="mb-4 mt-4">
+    <a routerLink="/profil" class="btn btn-outline-primary me-2">Profil</a>
+    <a routerLink="/pretraga-rezervacija" class="btn btn-outline-primary">Pretraga i rezervacija</a>
+  </nav>
+  @if (objekat) {
+    <h2>{{ objekat.naziv }}</h2>
+    <hr>
+    
+    <div class="info">
+      <p><strong>Grad:</strong> {{ objekat.grad }}</p>
+      <p><strong>Adresa:</strong> {{ objekat.adresa }}</p>
+      <p><strong>Radno vreme:</strong> {{ objekat.radnoVreme }}</p>
+      <p><strong>Cena po satu:</strong> {{ objekat.cenaPoSatu }} RSD</p>
+      <p><strong>Opis (Teren):</strong> {{ trenutniTeren?.opisOpreme || 'Nema posebnog opisa' }}</p>
+    </div>
+
+    <div class="galerija-mapa" style="display: flex; gap: 20px; margin-top: 20px;">
+      <div class="galerija" style="flex: 1;">
+        <h3>Galerija</h3>
+        @if (galerija.length === 0) {
+          <div>Nema dostupnih slika.</div>
+        }
+        <div style="display: flex; gap: 10px; overflow-x: auto;">
+          @for (slika of galerija; track $index) {
+            <img [src]="'assets/' + slika" style="width: 200px; height: 150px; object-fit: cover;">
+          }
+        </div>
+      </div>
+      
+      <div class="mapa-kontejner" style="flex: 1;">
+        <h3>Mapa</h3>
+        <div [id]="'map-' + objekatId" style="height: 300px; width: 100%;"></div>
+      </div>
+    </div>
+
+    <hr>
+
+    <h3>Interaktivni Kalendar</h3>
+    
+    <div class="kalendar-kontrole" style="margin-bottom: 15px;">
+      <label>Tip terena/hale: </label>
+      <select [(ngModel)]="odabraniTipTerena" (change)="azurirajTereneIstogTipa()">
+        <option value="OTVORENI">Otvoreni</option>
+        <option value="ZATVORENI">Zatvoreni</option>
+      </select>
+      
+      @if (tereniIstogTipa.length > 0) {
+        <div style="margin-top: 10px; display: inline-block; margin-left: 20px;">
+          <button (click)="prethodniTeren()" [disabled]="trenutniTerenIndex === 0"> &lt; </button>
+          <span style="margin: 0 10px;">{{ trenutniTeren?.naziv }} ({{ trenutniTerenIndex + 1 }} / {{ tereniIstogTipa.length }})</span>
+          <button (click)="sledeciTeren()" [disabled]="trenutniTerenIndex === tereniIstogTipa.length - 1"> &gt; </button>
+        </div>
+      }
+    </div>
+
+    @if (trenutniTeren) {
+      <div style="overflow-x: auto;">
+        <table border="1" cellpadding="5" style="border-collapse: collapse; text-align: center; min-width: 800px;">
+          <thead>
+            <tr style="background-color: #f0f0f0;">
+              <th>Vreme</th>
+              @for (dan of daniUNedelji; track $index) {
+                <th>
+                  {{ dan | date:'EEEE' }}<br>{{ dan | date:'dd.MM.' }}
+                </th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (sat of sati; track $index) {
+              <tr>
+                <td>{{ sat }}:00</td>
+                @for (dan of daniUNedelji; track $index) {
+                  <td (click)="odaberiTerminIzKalendara(dan, sat)"
+                      [ngClass]="{'zauzet': jeRezervisan(dan, sat), 'slobodan': !jeRezervisan(dan, sat)}">
+                    @if (jeRezervisan(dan, sat)) {
+                      <span>Zauzeto</span>
+                    }
+                    @if (!jeRezervisan(dan, sat)) {
+                      <span>Slobodno</span>
+                    }
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+    @if (!trenutniTeren) {
+      <div>
+        Nema terena izabranog tipa.
+      </div>
+    }
+
+    <hr>
+    
+    <div class="rezervacija-forma">
+      <h3>Kreiraj rezervaciju</h3>
+      <table>
+        <tr>
+          <td>Datum:</td>
+          <td><input type="date" [(ngModel)]="rezDatum"></td>
+        </tr>
+        <tr>
+          <td>Vreme od (h):</td>
+          <td><input type="number" [(ngModel)]="rezVremeOd" min="0" max="23"></td>
+        </tr>
+        <tr>
+          <td>Sport:</td>
+          <td>
+            <select [(ngModel)]="rezSport" [disabled]="isSportZakljucan">
+              @for (sport of sportovi; track sport) {
+                <option [value]="sport">{{ sport }}</option>
+              }
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2"><button (click)="rezervisi()">Rezerviši</button></td>
+        </tr>
+      </table>
+    </div>
+  }
+</div>

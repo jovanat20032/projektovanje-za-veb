@@ -26,6 +26,17 @@ export class ObjekatService {
     return this.http.get<any[]>(`${this.uri}/pretraga`, { params });
   }
 
+  pretragaSportista(naziv: string, grad: string, sport: string, tipTerena: string, slobodniDanas: boolean): Observable<any[]> {
+    let params = new HttpParams();
+    if (naziv) params = params.set('naziv', naziv);
+    if (grad) params = params.set('grad', grad);
+    if (sport) params = params.set('sport', sport);
+    if (tipTerena) params = params.set('tipTerena', tipTerena);
+    if (slobodniDanas) params = params.set('slobodniDanas', slobodniDanas.toString());
+    
+    return this.http.get<any[]>(`${this.uri}/pretraga-sportista`, { params });
+  }
+
   getObjekatDetalji(id: number): Observable<any> {
     return this.http.get<any>(`${this.uri}/${id}`);
   }

@@ -1,0 +1,92 @@
+<div class="container mt-4">
+  <nav class="mb-4">
+    <a routerLink="/profil" class="btn btn-outline-primary me-2">Profil</a>
+    <a routerLink="/pretraga-rezervacija" class="btn btn-outline-primary me-2">Pretraga i rezervacija</a>
+    <a routerLink="/oglasi" class="btn btn-outline-primary me-2">Pronalaženje saigrača</a>
+    <a routerLink="/treneri" class="btn btn-outline-primary me-2">Individualni trening</a>
+    <a routerLink="/prodavnica" class="btn btn-primary me-2">Prodavnica opreme</a>
+    <a routerLink="/statistika" class="btn btn-outline-primary">Statistika</a>
+  </nav>
+
+  <h2>Prodavnica opreme</h2>
+  <hr>
+
+  <div class="row">
+    <!-- Leva strana: Katalog -->
+    <div class="col-md-8">
+      <div class="mb-4">
+        <label class="form-label fw-bold">Prikaži samo sport:</label>
+        <select class="form-select w-50" [(ngModel)]="izabraniSport" (change)="promeniSport()">
+          <option value="SVI">-- Svi sportovi --</option>
+          @for (sport of sviSportovi; track sport.id) {
+            <option [value]="sport.naziv">{{ sport.naziv }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="row">
+        @if (opremaKatalog.length === 0) {
+          <div class="col-12">
+            <div class="alert alert-info">Trenutno nema dostupne opreme za ovaj sport.</div>
+          </div>
+        } @else {
+          @for (artikal of opremaKatalog; track artikal.id) {
+            <div class="col-md-4 mb-4">
+              <div class="card h-100 shadow-sm border-0 bg-light">
+                @if (artikal.slika) {
+                  <img [src]="artikal.slika" class="card-img-top p-3 bg-white" alt="Slika opreme" style="height: 200px; object-fit: contain;">
+                } @else {
+                  <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                    Nema slike
+                  </div>
+                }
+                <div class="card-body d-flex flex-column">
+                  <h5 class="card-title">{{ artikal.naziv }}</h5>
+                  <h6 class="card-subtitle mb-2 text-muted">{{ artikal.sport }}</h6>
+                  <p class="card-text mb-1 fw-bold fs-5">{{ artikal.cena | number:'1.2-2' }} RSD</p>
+                  <p class="card-text small mb-3">Na stanju: <span class="badge bg-success">{{ artikal.zaliha }}</span></p>
+                  <div class="mt-auto">
+                    <button class="btn btn-primary w-100" (click)="dodajUKorpu(artikal)" [disabled]="artikal.zaliha <= 0">
+                      Dodaj u korpu
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Desna strana: Korpa -->
+    <div class="col-md-4">
+      <div class="card sticky-top" style="top: 20px;">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">Moja Korpa</h5>
+        </div>
+        <div class="card-body">
+          @if (korpa.length === 0) {
+            <p class="text-muted">Korpa je trenutno prazna.</p>
+          } @else {
+            <ul class="list-group mb-3">
+              @for (stavka of korpa; track stavka.opremaId; let i = $index) {
+                <li class="list-group-item d-flex justify-content-between align-items-start px-2 py-2">
+                  <div class="ms-2 me-auto">
+                    <div class="fw-bold">{{ stavka.naziv }}</div>
+                    <span class="small text-muted">{{ stavka.kolicina }} x {{ stavka.cenaPoKomadu | number:'1.2-2' }} RSD</span>
+                  </div>
+                  <button class="btn btn-sm btn-outline-danger py-0 px-2 mt-1" (click)="izbaciIzKorpe(i)">X</button>
+                </li>
+              }
+            </ul>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="fw-bold">Ukupno:</span>
+              <span class="fw-bold fs-5 text-primary">{{ ukupnaCena | number:'1.2-2' }} RSD</span>
+            </div>
+            <button class="btn btn-success w-100" (click)="naruci()">Potvrdi narudžbinu</button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

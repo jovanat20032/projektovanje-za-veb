@@ -1,0 +1,79 @@
+<div class="container mt-4">
+  <nav class="mb-4">
+    <a routerLink="/profil" class="btn btn-outline-primary me-2">Profil</a>
+    <a routerLink="/pretraga-rezervacija" class="btn btn-outline-primary me-2">Pretraga i rezervacija</a>
+    <a routerLink="/oglasi" class="btn btn-outline-primary me-2">Pronalaženje saigrača</a>
+    <a routerLink="/treneri" class="btn btn-primary me-2">Individualni trening</a>
+    <a routerLink="/statistika" class="btn btn-outline-primary">Statistika</a>
+  </nav>
+
+  <h2>Individualni treninzi</h2>
+  <hr>
+
+  <div class="row mb-4">
+    <div class="col-md-5">
+      <label class="form-label">Izaberite objekat:</label>
+      <select class="form-select" [(ngModel)]="izabraniObjekat">
+        <option value="0" disabled>-- Objekat --</option>
+        @for (obj of objekti; track obj.id) {
+          <option [value]="obj.id">{{ obj.naziv }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-md-5">
+      <label class="form-label">Izaberite sport:</label>
+      <select class="form-select" [(ngModel)]="izabraniSport">
+        <option value="" disabled>-- Sport --</option>
+        @for (sport of sviSportovi; track sport.id) {
+          <option [value]="sport.naziv">{{ sport.naziv }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+      <button class="btn btn-success w-100" (click)="pretraziTrenere()">Pretraži</button>
+    </div>
+  </div>
+
+  @if (treneri.length === 0) {
+    <div class="alert alert-info">
+      Izaberite objekat i sport da biste videli dostupne trenere, ili trenutno nema trenera za taj filter.
+    </div>
+  } @else {
+    <div class="row">
+      @for (t of treneri; track t.korisnickoIme) {
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow-sm border-0 bg-light">
+            <div class="card-body">
+              <h5 class="card-title text-primary">{{ t.ime }} {{ t.prezime }}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">{{ t.sport }} - {{ t.specijalizacija }}</h6>
+              <p class="card-text mb-1">
+                <strong>Ocena:</strong> <span class="badge bg-warning text-dark">{{ t.prosecnaOcena | number:'1.2-2' }} ⭐</span>
+              </p>
+              <p class="card-text">
+                <strong>Cena:</strong> {{ t.cenaPoSatu }} RSD / sat
+              </p>
+
+              @if (otvorenaFormaZa === t.korisnickoIme) {
+                <div class="mt-3 p-3 border rounded bg-white">
+                  <h6>Zakazivanje termina</h6>
+                  <div class="mb-2">
+                    <label class="form-label small">Datum</label>
+                    <input type="date" class="form-control form-control-sm" [(ngModel)]="rezDatum">
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label small">Vreme</label>
+                    <input type="time" class="form-control form-control-sm" [(ngModel)]="rezVreme">
+                  </div>
+                  <button class="btn btn-sm btn-success w-100 mb-1" (click)="zakazi(t.korisnickoIme)">Potvrdi zakazivanje</button>
+                  <button class="btn btn-sm btn-outline-secondary w-100" (click)="otvorenaFormaZa = null">Odustani</button>
+                </div>
+              } @else {
+                <button class="btn btn-outline-primary mt-2 w-100" (click)="otvoriFormu(t.korisnickoIme)">Zakaži trening</button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

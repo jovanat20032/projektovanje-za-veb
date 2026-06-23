@@ -1,20 +1,25 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { KorisnikService } from '../services/korisnik.service';
 import { Korisnik } from '../models/korisnik';
 import { Sport } from '../models/sport';
 import { Rezervacija } from '../models/rezervacija';
+import { TrenerService } from '../services/trener.service';
+import { ProdavnicaService } from '../services/prodavnica.service';
 
 @Component({
   selector: 'app-profil',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './profil.component.html',
   styleUrl: './profil.component.css'
 })
 export class ProfilComponent implements OnInit {
   private korisnikService = inject(KorisnikService);
+  private trenerService = inject(TrenerService);
+  private prodavnicaService = inject(ProdavnicaService);
 
   korisnik: Korisnik = new Korisnik();
   poruka: string = '';
@@ -24,6 +29,8 @@ export class ProfilComponent implements OnInit {
   porukaSportovi: string = '';
 
   rezervacije: Rezervacija[] = [];
+  mojiTreninzi: any[] = [];
+  mojePorudzbine: any[] = [];
 
   ngOnInit(): void {
     const ulogovan = localStorage.getItem('korisnickoIme'); 
@@ -55,10 +62,39 @@ export class ProfilComponent implements OnInit {
       });
       this.korisnikService.dohvatiMojeRezervacije(ulogovan).subscribe({
         next: (rez) => {
-          console.log("5. MOJE REZERVACIJE SA BEKENDA:", rez);
           this.rezervacije = rez;
         },
         error: (err) => console.error("Greška pri dohvatanju rezervacija:", err)
+      });
+
+      this.trenerService.getTreninziZaSportistu(ulogovan).subscribe({
+        next: (treninzi) => {
+          this.mojiTreninzi = treninzi;
+        },
+        error: (err) => console.error("Greška pri dohvatanju treninga:", err)
+      });
+
+      this.ucitajPorudzbine(ulogovan);
+    }
+  }
+
+  ucitajPorudzbine(korisnickoIme: string) {
+    this.prodavnicaService.getMojePorudzbine(korisnickoIme).subscribe({
+      next: (porudzbine) => {
+        this.mojePorudzbine = porudzbine;
+      },
+      error: (err) => console.error("Greška pri dohvatanju porudžbina:", err)
+    });
+  }
+
+  otkaziPorudzbinu(id: number) {
+    if (confirm('Da li ste sigurni da želite da otkažete ovu porudžbinu?')) {
+      this.prodavnicaService.otkaziPorudzbinu(id).subscribe({
+        next: (res) => {
+          alert(res.message);
+          this.ucitajPorudzbine(this.korisnik.korisnickoIme);
+        },
+        error: (err) => alert(err.error.message || 'Greška pri otkazivanju.')
       });
     }
   }

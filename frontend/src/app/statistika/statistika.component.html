@@ -1,0 +1,57 @@
+<div class="container mt-4">
+  <nav class="mb-4">
+    <a routerLink="/profil" class="btn btn-outline-primary me-2">Profil</a>
+    <a routerLink="/pretraga-rezervacija" class="btn btn-outline-primary me-2">Pretraga i rezervacija</a>
+    <a routerLink="/oglasi" class="btn btn-outline-primary me-2">Pronalaženje saigrača</a>
+    <a routerLink="/treneri" class="btn btn-outline-primary me-2">Individualni trening</a>
+    <a routerLink="/prodavnica" class="btn btn-outline-primary me-2">Prodavnica opreme</a>
+    <a routerLink="/statistika" class="btn btn-primary">Statistika</a>
+  </nav>
+
+  <h2>Statistički podaci sistema</h2>
+  <hr>
+
+  <div class="row mb-5">
+
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">Broj rezervisanih termina po sportu</h5>
+        </div>
+        <div class="card-body">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">Mesečni pregled aktivnosti (Trend)</h5>
+        </div>
+        <div class="card-body">
+          <canvas id="lineChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-5 justify-content-center">
+
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Potrošnja na opremu za sve sportiste</h5>
+          <span class="badge bg-success" style="font-size: 1.1em;">Ukupno u sistemu: {{ ukupnaPotrosnja }} RSD</span>
+        </div>
+        <div class="card-body">
+          <div style="max-height: 400px; display: flex; justify-content: center;">
+            <canvas id="pieChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

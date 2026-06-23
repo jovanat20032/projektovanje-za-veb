@@ -9,18 +9,20 @@ public class Rezervacija {
     private LocalDateTime vremeOd;
     private LocalDateTime vremeDo;
     private String status;
+    private String sport;
 
     public Rezervacija() {}
 
 
     public Rezervacija(int id, String korisnickoIme, int terenId, LocalDateTime vremeOd, LocalDateTime vremeDo,
-            String status) {
+            String status, String sport) {
         this.id = id;
         this.korisnickoIme = korisnickoIme;
         this.terenId = terenId;
         this.vremeOd = vremeOd;
         this.vremeDo = vremeDo;
         this.status = status;
+        this.sport = sport;
     }
 
     public int getId() {
@@ -70,5 +72,12 @@ public class Rezervacija {
     public void setStatus(String status) {
         this.status = status;
     }
-    
+
+    public String getSport() {
+        return sport;
+    }
+
+    public void setSport(String sport) {
+        this.sport = sport;
+    }
 }

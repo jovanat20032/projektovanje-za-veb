@@ -171,5 +171,117 @@ public class ObjekatRepo implements ObjekatRepoInterface{
         }
         return slike;
     }
+
+    public List<String> getSportoviZaObjekat(int objekatId) {
+        List<String> sportovi = new ArrayList<>();
+        String sql = "SELECT s.naziv FROM sportovi s JOIN objekat_sport os ON s.id = os.sport_id WHERE os.objekat_id = ?";
+        try (Connection conn = DB.source().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, objekatId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                sportovi.add(rs.getString("naziv"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return sportovi;
+    }
+
+    @Override
+    public List<Objekat> pretragaSportista(String naziv, String grad, String sport, String tipTerena, boolean slobodniDanas) {
+        List<Objekat> rezultati = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "SELECT o.*, GROUP_CONCAT(DISTINCT s.naziv SEPARATOR ', ') as sport_lista " +
+            "FROM objekti o " +
+            "LEFT JOIN objekat_sport os ON o.id = os.objekat_id " +
+            "LEFT JOIN sportovi s ON os.sport_id = s.id " +
+            "LEFT JOIN tereni t ON o.id = t.objekat_id " +
+            "WHERE o.status = 'ODOBREN' "
+        );
+
+        if (naziv != null && !naziv.isEmpty()) sql.append(" AND o.naziv LIKE ? ");
+        if (grad != null && !grad.isEmpty()) sql.append(" AND o.grad = ? ");
+        if (sport != null && !sport.isEmpty()) sql.append(" AND s.naziv = ? ");
+        if (tipTerena != null && !tipTerena.isEmpty()) sql.append(" AND t.tip = ? ");
+
+        sql.append(" GROUP BY o.id");
+
+        try (Connection conn = DB.source().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            int paramIndex = 1;
+            if (naziv != null && !naziv.isEmpty()) stmt.setString(paramIndex++, "%" + naziv + "%");
+            if (grad != null && !grad.isEmpty()) stmt.setString(paramIndex++, grad);
+            if (sport != null && !sport.isEmpty()) stmt.setString(paramIndex++, sport);
+            if (tipTerena != null && !tipTerena.isEmpty()) stmt.setString(paramIndex++, tipTerena);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Objekat o = mapirajObjekat(rs);
+                o.setSport(rs.getString("sport_lista"));
+                
+                boolean dodaj = true;
+                if (slobodniDanas) {
+                    // Check if it has free slots today
+                    dodaj = imaSlobodnihTerminaDanas(o.getId(), conn);
+                }
+                
+                if (dodaj) {
+                    rezultati.add(o);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rezultati;
+    }
+
+    private boolean imaSlobodnihTerminaDanas(int objekatId, Connection conn) throws SQLException {
+        // Find radno_vreme
+        String sqlObjekat = "SELECT radno_vreme FROM objekti WHERE id = ?";
+        String radnoVreme = null;
+        try (PreparedStatement stmt = conn.prepareStatement(sqlObjekat)) {
+            stmt.setInt(1, objekatId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) radnoVreme = rs.getString("radno_vreme");
+        }
+        if (radnoVreme == null || !radnoVreme.contains("-")) return false;
+        
+        // Extract hours
+        String[] delovi = radnoVreme.split("-");
+        int radnoVremeOd = Integer.parseInt(delovi[0].trim().split(":")[0]);
+        int radnoVremeDo = Integer.parseInt(delovi[1].trim().split(":")[0]);
+        int ukupanBrojSati = radnoVremeDo - radnoVremeOd;
+
+        // Get tereni
+        List<Integer> terenIds = new ArrayList<>();
+        String sqlTereni = "SELECT id FROM tereni WHERE objekat_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sqlTereni)) {
+            stmt.setInt(1, objekatId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                terenIds.add(rs.getInt("id"));
+            }
+        }
+
+        if (terenIds.isEmpty()) return false;
+
+        // For each teren, check if there is at least one free 1-hour slot today
+        for (int terenId : terenIds) {
+            String sqlRezervacije = "SELECT COUNT(*) as broj_rezervacija_danas FROM rezervacije WHERE teren_id = ? AND status IN ('AKTIVNA', 'POTVRDJENA') AND DATE(vreme_od) = CURRENT_DATE";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlRezervacije)) {
+                stmt.setInt(1, terenId);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    int rez = rs.getInt("broj_rezervacija_danas");
+                    if (rez < ukupanBrojSati) {
+                        return true; // Found at least one free slot!
+                    }
+                }
+            }
+        }
+        return false;
+    }
 }
 

@@ -1,0 +1,103 @@
+<div class="container">
+  <nav class="mb-4 mt-4">
+    <a routerLink="/profil" class="btn btn-outline-primary me-2">Profil</a>
+    <a routerLink="/pretraga-rezervacija" class="btn btn-primary me-2">Pretraga i rezervacija</a>
+    <a routerLink="/oglasi" class="btn btn-outline-primary me-2">Pronalaženje saigrača</a>
+    <a routerLink="/treneri" class="btn btn-outline-primary me-2">Individualni trening</a>
+    <a routerLink="/prodavnica" class="btn btn-outline-primary me-2">Prodavnica opreme</a>
+    <a routerLink="/statistika" class="btn btn-outline-primary">Statistika</a>
+  </nav>
+  <div class="pretraga">
+    <h3>Pretraga sportskih objekata i rezervacija</h3>
+    <table>
+      <tr>
+        <td>Naziv objekta:</td>
+        <td><input type="text" [(ngModel)]="pretNaziv" name="naziv" placeholder="Unesite naziv..."></td>
+      </tr>
+      <tr>
+        <td>Grad:</td>
+        <td>
+          <select [(ngModel)]="pretGrad" name="grad">
+            <option value="">-- Svi gradovi --</option>
+            @for (grad of gradovi; track $index) {
+              <option [value]="grad">{{ grad }}</option>
+            }
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Vrsta sporta:</td>
+        <td>
+          <select [(ngModel)]="pretSport" name="sport">
+            <option value="">-- Svi sportovi --</option>
+            <option value="Tenis">Tenis</option>
+            <option value="Kosarka">Košarka</option>
+            <option value="Fudbal">Fudbal</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Tip terena:</td>
+        <td>
+          <select [(ngModel)]="pretTipTerena" name="tipTerena">
+            <option value="">-- Svi --</option>
+            <option value="OTVORENI">Otvoreni</option>
+            <option value="ZATVORENI">Zatvoreni</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <label>
+            <input type="checkbox" [(ngModel)]="slobodniDanas"> Samo slobodni termini danas
+          </label>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <button (click)="pretrazi()">Pretraži</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <hr>
+
+  @if (rezultatiPretrage.length > 0) {
+    <div class="rezultati">
+      <h3>Rezultati pretrage</h3>
+      <table border="1" cellpadding="5">
+        <thead>
+          <tr>
+            <th (click)="sortiraj('naziv')" style="cursor:pointer; background-color: #f0f0f0;">
+              Naziv objekta {{ sortKolona === 'naziv' ? (sortSmer === 'asc' ? '▲' : '▼') : '↕' }}
+            </th>
+            <th (click)="sortiraj('grad')" style="cursor:pointer; background-color: #f0f0f0;">
+              Grad {{ sortKolona === 'grad' ? (sortSmer === 'asc' ? '▲' : '▼') : '↕' }}
+            </th>
+            <th (click)="sortiraj('sport')" style="cursor:pointer; background-color: #f0f0f0;">
+              Vrsta sporta {{ sortKolona === 'sport' ? (sortSmer === 'asc' ? '▲' : '▼') : '↕' }}
+            </th>
+            <th>Adresa</th>
+            <th>Akcija</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (rez of rezultatiPretrage; track rez.id) {
+            <tr>
+              <td>{{ rez.naziv }}</td>
+              <td>{{ rez.grad }}</td>
+              <td>{{ rez.sport ? rez.sport : '-' }}</td>
+              <td>{{ rez.adresa }}</td>
+              <td>
+                <button (click)="idiNaDetalje(rez.id)">Detalji / Rezervacija</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p>Nema rezultata za zadate kriterijume.</p>
+  }
+</div>

@@ -9,6 +9,7 @@ public interface ObjekatRepoInterface {
     int getUkupanBrojAktivnih();
     List<Objekat> getTop3Aktivna();
     List<Objekat> pretraga(String naziv, String grad, String sport);
+    List<Objekat> pretragaSportista(String naziv, String grad, String sport, String tipTerena, boolean slobodniDanas);
     List<String> getSviGradovi();
     List<Promocija> getTop3Promocije();
     Objekat getById(int id);

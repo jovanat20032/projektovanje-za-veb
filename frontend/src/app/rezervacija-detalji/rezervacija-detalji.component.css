@@ -1,0 +1,32 @@
+@import "leaflet/dist/leaflet.css";
+
+.zauzet {
+  background-color: #ffcccc;
+  cursor: not-allowed;
+}
+
+.slobodan {
+  background-color: #ccffcc;
+  cursor: pointer;
+}
+
+.slobodan:hover {
+  background-color: #99ff99;
+}
+
+table {
+  width: 100%;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+.rezervacija-forma {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 5px;
+  max-width: 400px;
+}

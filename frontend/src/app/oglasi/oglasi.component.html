@@ -1,0 +1,134 @@
+<div class="container mt-4">
+  <nav class="mb-4">
+    <a routerLink="/profil" class="btn btn-outline-primary me-2">Profil</a>
+    <a routerLink="/pretraga-rezervacija" class="btn btn-outline-primary me-2">Pretraga i rezervacija</a>
+    <a routerLink="/oglasi" class="btn btn-primary me-2">Pronalaženje saigrača</a>
+    <a routerLink="/treneri" class="btn btn-outline-primary me-2">Individualni trening</a>
+    <a routerLink="/prodavnica" class="btn btn-outline-primary me-2">Prodavnica opreme</a>
+    <a routerLink="/statistika" class="btn btn-outline-primary">Statistika</a>
+  </nav>
+
+  <h2>Pronalaženje saigrača</h2>
+  <hr>
+
+  <div class="row">
+
+    <div class="col-md-7">
+      
+
+      <div class="card mb-4">
+        <div class="card-header bg-light">
+          <h4 class="mb-0">Objavi oglas - Tražim saigrače</h4>
+        </div>
+        <div class="card-body">
+          <table class="table table-borderless mb-0">
+            <tr>
+              <td>Sport:</td>
+              <td><input type="text" class="form-control" [(ngModel)]="noviOglas.sport" placeholder="Npr. Fudbal"></td>
+            </tr>
+            <tr>
+              <td>Grad:</td>
+              <td><input type="text" class="form-control" [(ngModel)]="noviOglas.grad" placeholder="Npr. Beograd"></td>
+            </tr>
+            <tr>
+              <td>Datum:</td>
+              <td><input type="date" class="form-control" [(ngModel)]="noviOglas.datum"></td>
+            </tr>
+            <tr>
+              <td>Vreme (h:m):</td>
+              <td><input type="time" class="form-control" [(ngModel)]="noviOglas.vreme"></td>
+            </tr>
+            <tr>
+              <td>Nedostaje igrača:</td>
+              <td><input type="number" class="form-control" [(ngModel)]="noviOglas.nedostajeIgraca" min="1"></td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <button class="btn btn-success" (click)="objaviOglas()">Objavi oglas</button>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+
+      <h4>Aktivni oglasi drugih korisnika</h4>
+      @if (sviAktivniOglasi.length === 0) {
+        <p>Trenutno nema aktivnih oglasa.</p>
+      } @else {
+        <table class="table table-striped table-bordered">
+          <thead class="table-dark">
+            <tr>
+              <th>Autor</th>
+              <th>Sport</th>
+              <th>Grad</th>
+              <th>Termin</th>
+              <th>Nedostaje</th>
+              <th>Akcija</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (oglas of sviAktivniOglasi; track oglas.id) {
+              <tr>
+                <td>{{ oglas.korisnickoIme }}</td>
+                <td>{{ oglas.sport }}</td>
+                <td>{{ oglas.grad }}</td>
+                <td>{{ oglas.datumVreme | date:'dd.MM.yyyy HH:mm' }}</td>
+                <td>{{ oglas.nedostajeIgraca }}</td>
+                <td>
+                  <button class="btn btn-sm btn-primary" (click)="prijaviSe(oglas.id)">Prijavi se</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+
+    <div class="col-md-5">
+      <h4>Moji oglasi</h4>
+      @if (mojiOglasi.length === 0) {
+        <p>Nemate kreiranih oglasa.</p>
+      } @else {
+        @for (moj of mojiOglasi; track moj.id) {
+          <div class="card mb-3" [ngClass]="{'border-success': moj.status === 'AKTIVAN', 'border-secondary opacity-75': moj.status !== 'AKTIVAN'}">
+            <div class="card-header d-flex justify-content-between align-items-center"
+                 [ngClass]="{'bg-success text-white': moj.status === 'AKTIVAN', 'bg-secondary text-white': moj.status !== 'AKTIVAN'}">
+              <strong>{{ moj.sport }} - {{ moj.grad }}</strong>
+              <span class="badge bg-light text-dark">{{ moj.status }}</span>
+            </div>
+            <div class="card-body">
+              <p class="mb-1"><strong>Termin:</strong> {{ moj.datumVreme | date:'dd.MM.yyyy HH:mm' }}</p>
+              <p class="mb-2"><strong>Traži se:</strong> Još {{ moj.nedostajeIgraca }} igrača</p>
+              
+              @if (moj.status === 'AKTIVAN') {
+                <button class="btn btn-sm btn-danger mb-3" (click)="zatvoriOglas(moj.id)">Zatvori oglas</button>
+              }
+
+
+              <h6 class="border-bottom pb-1">Prijave za ovaj oglas:</h6>
+              @if (!moj.zahtevi || moj.zahtevi.length === 0) {
+                <p class="text-muted small">Nema prijava.</p>
+              } @else {
+                <ul class="list-group list-group-flush">
+                  @for (zahtev of moj.zahtevi; track zahtev.id) {
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-1">
+                      <span>{{ zahtev.korisnickoIme }} <small>({{ zahtev.status }})</small></span>
+                      @if (zahtev.status === 'NA_CEKANJU' && moj.status === 'AKTIVAN') {
+                        <div>
+                          <button class="btn btn-sm btn-outline-success me-1 py-0 px-2" (click)="promeniStatusZahteva(zahtev.id, 'ODOBREN')">✓</button>
+                          <button class="btn btn-sm btn-outline-danger py-0 px-2" (click)="promeniStatusZahteva(zahtev.id, 'ODBIJEN')">✗</button>
+                        </div>
+                      }
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>
