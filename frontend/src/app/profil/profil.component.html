@@ -1,1 +1,101 @@
-<p>profil works!</p>
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <h2 class="mb-4 text-center">Moj Profil</h2>
+      
+      <form (ngSubmit)="azuriraj()" #profilForma="ngForm" class="p-4 border rounded shadow-sm bg-light">
+        
+        <div class="form-group mb-3">
+          <label for="korisnickoIme" class="form-label">Korisničko ime</label>
+          <input type="text" class="form-control" id="korisnickoIme" name="korisnickoIme" [(ngModel)]="korisnik.korisnickoIme" disabled>
+          <small class="text-muted">Korisničko ime se ne može menjati.</small>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="ime" class="form-label">Ime</label>
+          <input type="text" class="form-control" id="ime" name="ime" [(ngModel)]="korisnik.ime" required>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="prezime" class="form-label">Prezime</label>
+          <input type="text" class="form-control" id="prezime" name="prezime" [(ngModel)]="korisnik.prezime" required>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="telefon" class="form-label">Telefon</label>
+          <input type="text" class="form-control" id="telefon" name="telefon" [(ngModel)]="korisnik.telefon">
+        </div>
+
+        <div class="form-group mb-4">
+          <label for="email" class="form-label">E-mail adresa</label>
+          <input type="email" class="form-control" id="email" name="email" [(ngModel)]="korisnik.email" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100" [disabled]="!profilForma.valid">Sačuvaj izmene</button>
+      </form>
+
+      <form (ngSubmit)="azurirajSportove()" class="p-4 mt-4 border rounded shadow-sm bg-light">
+        <h4 class="mb-3 text-center">Moji omiljeni sportovi</h4>
+        
+        <div class="form-group mb-3">
+          <label for="sportovi" class="form-label">Odaberi sportove (najviše 5):</label>
+          <select multiple class="form-control" id="sportovi" name="sportovi" [(ngModel)]="odabraniSportovi" style="height: 150px;">
+            <option *ngFor="let sport of sviSportovi" [value]="sport.naziv">
+              {{ sport.naziv }}
+            </option>
+          </select>
+          <br>
+          <small class="text-muted">Držite CTRL (Windows) ili CMD (Mac) za višestruki odabir.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100" [disabled]="odabraniSportovi.length > 5 || odabraniSportovi.length === 0">
+          Sačuvaj sportove
+        </button>
+      </form>
+
+      <div *ngIf="porukaSportovi" class="alert alert-info mt-3 text-center">
+        {{ porukaSportovi }}
+      </div>
+
+      <div *ngIf="poruka" class="alert alert-info mt-3 text-center">
+        {{ poruka }}
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mt-5">
+  <h4>Moje rezervacije</h4>
+  <table class="table">
+    <thead>
+      <tr>
+        <th (click)="sortiraj('nazivObjekta')">Objekat</th>
+        <th>Grad</th>
+        <th>Teren</th>
+        <th>Sport</th>
+        <th>Termin (od-do)</th>
+        <th>Status</th>
+        <th>Akcija</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of rezervacije">
+        <td>{{r.nazivObjekta}}</td>
+        <td>{{r.grad}}</td>
+        <td>{{r.nazivTerena}}</td>
+        <td>{{r.sport}}</td>
+        <td>{{r.vremeOd | date:'dd.MM. HH:mm'}} - {{r.vremeDo | date:'HH:mm'}}</td>
+        <td>{{r.status}}</td>
+        <td>
+            <button *ngIf="mozeDaOtkaze(r)" 
+                    (click)="otkazi(r.id)" 
+                    class="btn btn-danger btn-sm">
+                Otkaži
+            </button>
+            <span *ngIf="!mozeDaOtkaze(r)" class="text-muted small">
+                Otkazivanje nije moguće
+            </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

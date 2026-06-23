@@ -1,10 +1,15 @@
 package com.example.backend.db;
 
 import com.example.backend.models.Korisnik;
+import com.example.backend.models.RezervacijaDTO;
+import com.example.backend.models.Sport;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class KorisnikRepo implements KorisnikRepoInterface {
 
@@ -114,4 +119,130 @@ public class KorisnikRepo implements KorisnikRepoInterface {
             e.printStackTrace();
         }
         return false;    }
+
+    @Override
+    public boolean azurirajKorisnika(Korisnik korisnik) {
+        String sql = "UPDATE korisnici SET ime = ?, prezime = ?, telefon = ?, email = ? WHERE korisnicko_ime = ?";
+        try (Connection conn = DB.source().getConnection();
+            PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setString(1, korisnik.getIme());
+            st.setString(2, korisnik.getPrezime());
+            st.setString(3, korisnik.getTelefon());
+            st.setString(4, korisnik.getEmail());
+            st.setString(5, korisnik.getKorisnickoIme());
+            
+            int rows = st.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public List<Sport> dohvatiSveSportove() {
+        List<Sport> sportovi = new ArrayList<>();
+        String sql = "SELECT id, naziv, timski FROM sportovi";
+        try (Connection conn = DB.source().getConnection();
+             PreparedStatement st = conn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+            while (rs.next()) {
+                sportovi.add(new Sport(rs.getInt("id"), rs.getString("naziv"), rs.getBoolean("timski")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return sportovi;
+    }
+
+    @Override
+    public List<String> dohvatiOmiljeneSportove(String korisnickoIme) {
+        List<String> sportovi = new ArrayList<>();
+        String sql = "SELECT sport FROM omiljeni_sportovi WHERE korisnicko_ime = ?";
+        try (Connection conn = DB.source().getConnection();
+             PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setString(1, korisnickoIme);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                sportovi.add(rs.getString("sport"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return sportovi;
+    }
+
+    @Override
+    public boolean azurirajOmiljeneSportove(String korisnickoIme, List<String> sportovi) {
+        String sqlDelete = "DELETE FROM omiljeni_sportovi WHERE korisnicko_ime = ?";
+        String sqlInsert = "INSERT INTO omiljeni_sportovi (korisnicko_ime, sport) VALUES (?, ?)";
+        
+        try (Connection conn = DB.source().getConnection()) {
+            try (PreparedStatement stDel = conn.prepareStatement(sqlDelete)) {
+                stDel.setString(1, korisnickoIme);
+                stDel.executeUpdate();
+            }
+            try (PreparedStatement stIns = conn.prepareStatement(sqlInsert)) {
+                for (String sport : sportovi) {
+                    stIns.setString(1, korisnickoIme);
+                    stIns.setString(2, sport);
+                    stIns.executeUpdate();
+                }
+            }
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public List<RezervacijaDTO> dohvatiRezervacijeKorisnika(String korisnickoIme) {
+        List<RezervacijaDTO> lista = new ArrayList<>();
+        
+        String sql = "SELECT r.id, o.naziv AS objekat, o.grad, t.naziv AS teren, r.sport, " +
+                    "r.vreme_od, r.vreme_do, r.status " +
+                    "FROM rezervacije r " +
+                    "JOIN tereni t ON r.teren_id = t.id " +
+                    "JOIN objekti o ON t.objekat_id = o.id " +
+                    "WHERE r.korisnicko_ime = ? ORDER BY r.vreme_od DESC";
+                    
+        try (Connection conn = DB.source().getConnection();
+            PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setString(1, korisnickoIme);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                lista.add(new RezervacijaDTO(
+                    rs.getInt("id"),
+                    rs.getString("objekat"),
+                    rs.getString("grad"),
+                    rs.getString("teren"),
+                    rs.getString("sport"), // Sada čitamo direktno iz 'rezervacije' tabele
+                    rs.getTimestamp("vreme_od").toLocalDateTime(),
+                    rs.getTimestamp("vreme_do").toLocalDateTime(),
+                    rs.getString("status")
+                ));
+            }
+        } catch (SQLException e) { 
+            e.printStackTrace(); 
+        }
+        return lista;
+    }
+    @Override
+    public boolean otkaziRezervaciju(int id) {
+
+        String sql = "UPDATE rezervacije SET status = 'OTKAZANA' WHERE id = ?";
+        
+        try (Connection conn = DB.source().getConnection();
+            PreparedStatement st = conn.prepareStatement(sql)) {
+            
+            st.setInt(1, id);
+            
+            int rows = st.executeUpdate();
+            return rows > 0; 
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

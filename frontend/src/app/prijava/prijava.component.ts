@@ -27,6 +27,7 @@ export class PrijavaComponent {
           
           localStorage.setItem('jwt_token', odgovorSaBekenda.token);
           localStorage.setItem('uloga', odgovorSaBekenda.uloga);
+          localStorage.setItem('korisnickoIme', this.korisnickoIme);
           
           if (odgovorSaBekenda.uloga == "ADMIN") {
             this.router.navigate(['admin-dashboard']);

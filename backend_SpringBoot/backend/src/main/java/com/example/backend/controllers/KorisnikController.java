@@ -1,6 +1,8 @@
 package com.example.backend.controllers;
 
 import com.example.backend.models.Korisnik;
+import com.example.backend.models.RezervacijaDTO;
+import com.example.backend.models.Sport;
 import com.example.backend.config.JwtUtil;
 import com.example.backend.db.KorisnikRepo;
 
@@ -9,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -139,4 +142,61 @@ public class KorisnikController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Greška pri čuvanju u bazu.");
         }
     }
+
+    @GetMapping("/dohvatiKorisnika")
+public ResponseEntity<Korisnik> dohvatiKorisnika(@RequestParam String korisnickoIme) {
+    Korisnik k = korisnikRepo.findByKorisnickoIme(korisnickoIme);
+    if (k != null) {
+        return new ResponseEntity<>(k, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+}
+
+    @PostMapping("/azurirajProfil")
+    public ResponseEntity<String> azurirajProfil(@RequestBody Korisnik korisnik) {
+        boolean uspesno = korisnikRepo.azurirajKorisnika(korisnik);
+        if (uspesno) {
+            return new ResponseEntity<>("Profil uspešno ažuriran", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Greška pri ažuriranju", HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping("/sviSportovi")
+    public ResponseEntity<List<Sport>> dohvatiSveSportove() {
+        return new ResponseEntity<>(korisnikRepo.dohvatiSveSportove(), HttpStatus.OK);
+    }
+
+    @GetMapping("/omiljeniSportovi")
+    public ResponseEntity<List<String>> dohvatiOmiljeneSportove(@RequestParam String korisnickoIme) {
+        return new ResponseEntity<>(korisnikRepo.dohvatiOmiljeneSportove(korisnickoIme), HttpStatus.OK);
+    }
+
+    @PostMapping("/azurirajSportove")
+    public ResponseEntity<String> azurirajSportove(@RequestParam String korisnickoIme, @RequestBody List<String> sportovi) {
+        if (sportovi.size() > 5) {
+            return new ResponseEntity<>("Možete odabrati najviše 5 sportova.", HttpStatus.BAD_REQUEST);
+        }
+        
+        boolean uspesno = korisnikRepo.azurirajOmiljeneSportove(korisnickoIme, sportovi);
+        if (uspesno) {
+            return new ResponseEntity<>("Sportovi uspešno ažurirani", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Greška pri ažuriranju sportova", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @GetMapping("/mojeRezervacije")
+public ResponseEntity<List<RezervacijaDTO>> mojeRezervacije(@RequestParam String korisnickoIme) {
+    List<RezervacijaDTO> rezervacije = korisnikRepo.dohvatiRezervacijeKorisnika(korisnickoIme);
+    return new ResponseEntity<>(rezervacije, HttpStatus.OK);
+}
+
+@PostMapping("/otkaziRezervaciju")
+public ResponseEntity<String> otkaziRezervaciju(@RequestParam int id) {
+    boolean uspesno = korisnikRepo.otkaziRezervaciju(id); 
+    if (uspesno) {
+        return new ResponseEntity<>("Rezervacija je otkazana", HttpStatus.OK);
+    }
+    return new ResponseEntity<>("Greška pri otkazivanju", HttpStatus.BAD_REQUEST);
+}
+
 }
