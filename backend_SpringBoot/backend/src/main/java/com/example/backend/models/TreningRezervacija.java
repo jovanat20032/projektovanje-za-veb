@@ -13,6 +13,8 @@ public class TreningRezervacija {
     
     private String status;
 
+    private int terenId;
+
     // Dodatna polja za frontend prikaz
     private String trenerIme;
     private String sport;
@@ -21,6 +23,9 @@ public class TreningRezervacija {
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
+
+    public int getTerenId() { return terenId; }
+    public void setTerenId(int terenId) { this.terenId = terenId; }
 
     public String getTrenerKorisnickoIme() { return trenerKorisnickoIme; }
     public void setTrenerKorisnickoIme(String trenerKorisnickoIme) { this.trenerKorisnickoIme = trenerKorisnickoIme; }

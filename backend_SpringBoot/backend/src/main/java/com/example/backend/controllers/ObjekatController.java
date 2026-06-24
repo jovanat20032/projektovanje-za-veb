@@ -78,4 +78,42 @@ public class ObjekatController {
         return ResponseEntity.ok(rezultati);
     }
 
+    @GetMapping("/zaposleni")
+    public ResponseEntity<?> getObjektiZaposlenog(@RequestParam String korisnickoIme) {
+        List<com.example.backend.models.ZaposleniObjekatDTO> objekti = objekatRepo.dohvatiObjekteZaZaposlenog(korisnickoIme);
+        return ResponseEntity.ok(objekti);
+    }
+
+    @PostMapping("")
+    public ResponseEntity<?> dodajObjekat(@RequestBody com.example.backend.models.ObjekatCreateDTO dto, @RequestParam String korisnickoIme) {
+        int noviId = objekatRepo.dodajObjekat(dto, korisnickoIme);
+        if (noviId != -1) {
+            if (dto.getTereni() != null) {
+                for (Teren t : dto.getTereni()) {
+                    terenRepo.dodajTeren(t, noviId);
+                }
+            }
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Uspešno dodat objekat");
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.badRequest().body("Greška pri dodavanju objekta");
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> azurirajObjekat(@PathVariable int id, @RequestBody com.example.backend.models.ObjekatCreateDTO dto) {
+        boolean success = objekatRepo.azurirajObjekat(id, dto);
+        if (success) {
+            terenRepo.obrisiTereneZaObjekat(id);
+            if (dto.getTereni() != null) {
+                for (Teren t : dto.getTereni()) {
+                    terenRepo.dodajTeren(t, id);
+                }
+            }
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Uspešno ažuriran objekat");
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.badRequest().body("Greška pri ažuriranju objekta");
+    }
 }

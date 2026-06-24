@@ -122,14 +122,15 @@ public class KorisnikRepo implements KorisnikRepoInterface {
 
     @Override
     public boolean azurirajKorisnika(Korisnik korisnik) {
-        String sql = "UPDATE korisnici SET ime = ?, prezime = ?, telefon = ?, email = ? WHERE korisnicko_ime = ?";
+        String sql = "UPDATE korisnici SET ime = ?, prezime = ?, telefon = ?, email = ?, profilna_slika = ? WHERE korisnicko_ime = ?";
         try (Connection conn = DB.source().getConnection();
             PreparedStatement st = conn.prepareStatement(sql)) {
             st.setString(1, korisnik.getIme());
             st.setString(2, korisnik.getPrezime());
             st.setString(3, korisnik.getTelefon());
             st.setString(4, korisnik.getEmail());
-            st.setString(5, korisnik.getKorisnickoIme());
+            st.setString(5, korisnik.getProfilnaSlika());
+            st.setString(6, korisnik.getKorisnickoIme());
             
             int rows = st.executeUpdate();
             return rows > 0;

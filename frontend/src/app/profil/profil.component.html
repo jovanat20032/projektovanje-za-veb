@@ -1,11 +1,13 @@
 <div class="container mt-5">
   <nav class="mb-4">
     <a routerLink="/profil" class="btn btn-primary me-2">Profil</a>
-    <a routerLink="/pretraga-rezervacija" class="btn btn-outline-primary me-2">Pretraga i rezervacija</a>
+    <a routerLink="/pretraga-rezervacija" class="btn btn-outline-primary me-2" *ngIf="uloga === 'SPORTISTA'">Pretraga i rezervacija</a>
     <a routerLink="/oglasi" class="btn btn-outline-primary me-2">Pronalaženje saigrača</a>
-    <a routerLink="/treneri" class="btn btn-outline-primary me-2">Individualni trening</a>
-    <a routerLink="/prodavnica" class="btn btn-outline-primary me-2">Prodavnica opreme</a>
-    <a routerLink="/statistika" class="btn btn-outline-primary">Statistika</a>
+    <a routerLink="/prodavnica" class="btn btn-outline-primary me-2">Prodavnica sportske opreme</a>
+    <a routerLink="/treneri" class="btn btn-outline-primary me-2">Pronađi trenera</a>
+    <a routerLink="/statistika" class="btn btn-outline-primary me-2">Pregled sportova u gradu</a>
+    <a routerLink="/upravljanje-terminima" class="btn btn-outline-primary me-2" *ngIf="uloga === 'ZAPOSLENI'">Upravljanje terminima</a>
+    <button class="btn btn-outline-danger" (click)="odjaviSe()">Odjavi se</button>
   </nav>
   <div class="row">
     <div class="col-md-6 offset-md-3">
@@ -13,6 +15,17 @@
       
       <form (ngSubmit)="azuriraj()" #profilForma="ngForm" class="p-4 border rounded shadow-sm bg-light">
         
+        <div class="text-center mb-4">
+          <img [src]="'http://localhost:8080/uploads/' + korisnik.profilnaSlika" 
+               alt="Profilna slika" 
+               class="rounded-circle img-thumbnail mb-2" 
+               style="width: 150px; height: 150px; object-fit: cover;"
+               (error)="naGreskuSlike($event)">
+          <br>
+          <label for="novaSlika" class="btn btn-sm btn-outline-secondary mt-2">Promeni sliku</label>
+          <input type="file" id="novaSlika" class="d-none" accept="image/*" (change)="naOdabirSlike($event)">
+        </div>
+
         <div class="form-group mb-3">
           <label for="korisnickoIme" class="form-label">Korisničko ime</label>
           <input type="text" class="form-control" id="korisnickoIme" name="korisnickoIme" [(ngModel)]="korisnik.korisnickoIme" disabled>
@@ -42,7 +55,7 @@
         <button type="submit" class="btn btn-primary w-100" [disabled]="!profilForma.valid">Sačuvaj izmene</button>
       </form>
 
-      <form (ngSubmit)="azurirajSportove()" class="p-4 mt-4 border rounded shadow-sm bg-light">
+      <form *ngIf="uloga === 'SPORTISTA'" (ngSubmit)="azurirajSportove()" class="p-4 mt-4 border rounded shadow-sm bg-light">
         <h4 class="mb-3 text-center">Moji omiljeni sportovi</h4>
         
         <div class="form-group mb-3">
@@ -71,117 +84,179 @@
     </div>
   </div>
 </div>
-<div class="mt-5">
-  <h4>Moje rezervacije</h4>
-  <table class="table">
-    <thead>
-      <tr>
-        <th (click)="sortiraj('nazivObjekta')">Objekat</th>
-        <th>Grad</th>
-        <th>Teren</th>
-        <th>Sport</th>
-        <th>Termin (od-do)</th>
-        <th>Status</th>
-        <th>Akcija</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let r of rezervacije">
-        <td>{{r.nazivObjekta}}</td>
-        <td>{{r.grad}}</td>
-        <td>{{r.nazivTerena}}</td>
-        <td>{{r.sport}}</td>
-        <td>{{r.vremeOd | date:'dd.MM. HH:mm'}} - {{r.vremeDo | date:'HH:mm'}}</td>
-        <td>{{r.status}}</td>
-        <td>
-            <button *ngIf="mozeDaOtkaze(r)" 
-                    (click)="otkazi(r.id)" 
-                    class="btn btn-danger btn-sm">
-                Otkaži
-            </button>
-            <span *ngIf="!mozeDaOtkaze(r)" class="text-muted small">
-                Otkazivanje nije moguće
-            </span>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<div class="mt-5 mb-5">
-  <h4>Moji individualni treninzi</h4>
-  @if (mojiTreninzi.length === 0) {
-    <p class="text-muted">Nemate zakazanih individualnih treninga.</p>
-  } @else {
+<div *ngIf="uloga === 'SPORTISTA'">
+  <div class="mt-5">
+    <h4>Moje rezervacije</h4>
     <table class="table">
       <thead>
         <tr>
-          <th>Trener</th>
+          <th (click)="sortiraj('nazivObjekta')">Objekat</th>
+          <th>Grad</th>
+          <th>Teren</th>
           <th>Sport</th>
-          <th>Termin</th>
+          <th>Termin (od-do)</th>
           <th>Status</th>
+          <th>Akcija</th>
         </tr>
       </thead>
       <tbody>
-        @for (t of mojiTreninzi; track t.id) {
-          <tr>
-            <td>{{ t.trenerIme }}</td>
-            <td>{{ t.sport }}</td>
-            <td>{{ t.datumVreme | date:'dd.MM.yyyy HH:mm' }}</td>
-            <td>
-              <span class="badge" 
-                    [ngClass]="{'bg-success': t.status === 'ZAKAZAN', 'bg-secondary': t.status === 'ODRZAN', 'bg-danger': t.status === 'OTKAZAN'}">
-                {{ t.status }}
+        <tr *ngFor="let r of rezervacije">
+          <td>{{r.nazivObjekta}}</td>
+          <td>{{r.grad}}</td>
+          <td>{{r.nazivTerena}}</td>
+          <td>{{r.sport}}</td>
+          <td>{{r.vremeOd | date:'dd.MM. HH:mm'}} - {{r.vremeDo | date:'HH:mm'}}</td>
+          <td>{{r.status}}</td>
+          <td>
+              <button *ngIf="mozeDaOtkaze(r)" 
+                      (click)="otkazi(r.id)" 
+                      class="btn btn-danger btn-sm">
+                  Otkaži
+              </button>
+              <span *ngIf="!mozeDaOtkaze(r)" class="text-muted small">
+                  Otkazivanje nije moguće
               </span>
-            </td>
-          </tr>
-        }
+          </td>
+        </tr>
       </tbody>
     </table>
-  }
+  </div>
+
+  <div class="mt-5 mb-5">
+    <h4>Moji individualni treninzi</h4>
+    @if (mojiTreninzi.length === 0) {
+      <p class="text-muted">Nemate zakazanih individualnih treninga.</p>
+    } @else {
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Trener</th>
+            <th>Sport</th>
+            <th>Termin</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (t of mojiTreninzi; track t.id) {
+            <tr>
+              <td>{{ t.trenerIme }}</td>
+              <td>{{ t.sport }}</td>
+              <td>{{ t.datumVreme | date:'dd.MM.yyyy HH:mm' }}</td>
+              <td>
+                <span class="badge" 
+                      [ngClass]="{'bg-success': t.status === 'ZAKAZAN', 'bg-secondary': t.status === 'ODRZAN', 'bg-danger': t.status === 'OTKAZAN'}">
+                  {{ t.status }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  <div class="mt-5 mb-5">
+    <h4>Moje porudžbine (Prodavnica)</h4>
+    @if (mojePorudzbine.length === 0) {
+      <p class="text-muted">Nemate prethodnih porudžbina.</p>
+    } @else {
+      @for (p of mojePorudzbine; track p.id) {
+        <div class="card mb-3 shadow-sm">
+          <div class="card-header d-flex justify-content-between align-items-center bg-light">
+            <div>
+              <strong>ID porudžbine: #{{ p.id }}</strong>
+              <span class="ms-3 text-muted">{{ p.datumVreme | date:'dd.MM.yyyy HH:mm' }}</span>
+            </div>
+            <div>
+              <span class="badge me-3 fs-6" 
+                    [ngClass]="{'bg-primary': p.status === 'NARUCENO', 'bg-success': p.status === 'PREUZETO', 'bg-danger': p.status === 'OTKAZANO'}">
+                {{ p.status }}
+              </span>
+              @if (p.status === 'NARUCENO') {
+                <button class="btn btn-sm btn-outline-danger" (click)="otkaziPorudzbinu(p.id)">Otkaži</button>
+              }
+            </div>
+          </div>
+          <div class="card-body py-2">
+            <table class="table table-sm table-borderless mb-0">
+              <tbody>
+                @for (s of p.stavke; track s.id) {
+                  <tr>
+                    <td>{{ s.kolicina }}x {{ s.opremaNaziv }}</td>
+                    <td class="text-end">{{ s.cenaPoKomadu | number:'1.2-2' }} RSD</td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot class="border-top">
+                <tr>
+                  <td class="fw-bold">Ukupno:</td>
+                  <td class="text-end fw-bold text-primary">{{ p.ukupnaCena | number:'1.2-2' }} RSD</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      }
+    }
+  </div>
 </div>
 
-<div class="mt-5 mb-5">
-  <h4>Moje porudžbine (Prodavnica)</h4>
-  @if (mojePorudzbine.length === 0) {
-    <p class="text-muted">Nemate prethodnih porudžbina.</p>
-  } @else {
-    @for (p of mojePorudzbine; track p.id) {
-      <div class="card mb-3 shadow-sm">
-        <div class="card-header d-flex justify-content-between align-items-center bg-light">
-          <div>
-            <strong>ID porudžbine: #{{ p.id }}</strong>
-            <span class="ms-3 text-muted">{{ p.datumVreme | date:'dd.MM.yyyy HH:mm' }}</span>
-          </div>
-          <div>
-            <span class="badge me-3 fs-6" 
-                  [ngClass]="{'bg-primary': p.status === 'NARUCENO', 'bg-success': p.status === 'PREUZETO', 'bg-danger': p.status === 'OTKAZANO'}">
-              {{ p.status }}
-            </span>
-            @if (p.status === 'NARUCENO') {
-              <button class="btn btn-sm btn-outline-danger" (click)="otkaziPorudzbinu(p.id)">Otkaži</button>
-            }
-          </div>
-        </div>
-        <div class="card-body py-2">
-          <table class="table table-sm table-borderless mb-0">
-            <tbody>
-              @for (s of p.stavke; track s.id) {
-                <tr>
-                  <td>{{ s.kolicina }}x {{ s.opremaNaziv }}</td>
-                  <td class="text-end">{{ s.cenaPoKomadu | number:'1.2-2' }} RSD</td>
-                </tr>
-              }
-            </tbody>
-            <tfoot class="border-top">
-              <tr>
-                <td class="fw-bold">Ukupno:</td>
-                <td class="text-end fw-bold text-primary">{{ p.ukupnaCena | number:'1.2-2' }} RSD</td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-      </div>
+<div *ngIf="uloga === 'ZAPOSLENI'">
+  <div class="mt-5 mb-5 p-4 border rounded shadow-sm bg-light">
+    <h4 class="mb-4">Alati za zaposlene</h4>
+    <div class="d-flex gap-3">
+        <button class="btn btn-primary" routerLink="/upravljanje-terminima">Upravljanje terminima</button>
+        <button class="btn btn-primary" routerLink="/zaposleni-kalendar">Interaktivni kalendar</button>
+        <button class="btn btn-primary" routerLink="/zaposleni-izvestaji">Izveštaji</button>
+        <button class="btn btn-primary" routerLink="/zaposleni-promocije">Promocije</button>
+        <button class="btn btn-primary" routerLink="/zaposleni-oprema">Oprema i rekviziti</button>
+    </div>
+  </div>
+
+  <div class="mt-5 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4>Objekti kojima rukovodim</h4>
+      <a routerLink="/upravljanje-objektom" class="btn btn-success">Dodaj novi objekat</a>
+    </div>
+    @if (mojiObjekti.length === 0) {
+      <p class="text-muted">Trenutno ne rukovodite nijednim objektom.</p>
+    } @else {
+      <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
+          <tr>
+            <th>Naziv</th>
+            <th>Grad</th>
+            <th>Vrste sportova</th>
+            <th>Elementi (Tereni)</th>
+            <th>Akcija</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (o of mojiObjekti; track o.id) {
+            <tr>
+              <td class="align-middle fw-bold">{{ o.naziv }}</td>
+              <td class="align-middle">{{ o.grad }}</td>
+              <td class="align-middle">
+                <ul class="mb-0 ps-3">
+                  @for (s of o.vrsteSportova; track s) {
+                    <li>{{ s }}</li>
+                  }
+                </ul>
+              </td>
+              <td class="align-middle">
+                <ul class="mb-0 ps-3">
+                  @for (e of o.elementi; track e) {
+                    <li>{{ e }}</li>
+                  }
+                </ul>
+              </td>
+              <td class="align-middle text-center">
+                <a [routerLink]="['/upravljanje-objektom', o.id]" class="btn btn-primary btn-sm">Ažuriraj</a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
     }
-  }
+  </div>
 </div>

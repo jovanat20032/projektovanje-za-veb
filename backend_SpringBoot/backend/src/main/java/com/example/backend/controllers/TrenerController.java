@@ -37,4 +37,42 @@ public class TrenerController {
         List<TreningRezervacija> treninzi = trenerRepo.getTreninziZaSportistu(korisnickoIme);
         return ResponseEntity.ok(treninzi);
     }
+
+    @GetMapping("/zaposleni/{korisnickoIme}/treninzi")
+    public ResponseEntity<?> getTreninziZaZaposlenog(@PathVariable String korisnickoIme) {
+        List<TreningRezervacija> treninzi = trenerRepo.getTreninziZaZaposlenog(korisnickoIme);
+        return ResponseEntity.ok(treninzi);
+    }
+
+    @PutMapping("/treninzi/{id}/status")
+    public ResponseEntity<?> azurirajStatusTreninga(@PathVariable int id, @RequestBody java.util.Map<String, String> body) {
+        String status = body.get("status");
+        boolean uspeh = trenerRepo.azurirajStatusTreninga(id, status);
+        if (uspeh) {
+            return ResponseEntity.ok().body("{\"message\": \"Status uspesno azuriran\"}");
+        } else {
+            return ResponseEntity.badRequest().body("{\"message\": \"Greska pri azuriranju statusa\"}");
+        }
+    }
+
+    @GetMapping("/teren/{terenId}")
+    public ResponseEntity<?> getTreninziZaTeren(@PathVariable int terenId) {
+        List<TreningRezervacija> treninzi = trenerRepo.getTreninziZaTeren(terenId);
+        return ResponseEntity.ok(treninzi);
+    }
+
+    @PutMapping("/{id}/pomeri")
+    public ResponseEntity<?> pomeriTrening(@PathVariable int id, @RequestBody java.util.Map<String, String> body) {
+        try {
+            java.time.LocalDateTime novoVreme = java.time.LocalDateTime.parse(body.get("novoVreme"));
+            boolean uspeh = trenerRepo.pomeriTrening(id, novoVreme);
+            if (uspeh) {
+                return ResponseEntity.ok().body("{\"message\": \"Trening uspesno pomeren\"}");
+            } else {
+                return ResponseEntity.badRequest().body("{\"message\": \"Greska pri pomeranju treninga\"}");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("{\"message\": \"Nevalidan format datuma\"}");
+        }
+    }
 }

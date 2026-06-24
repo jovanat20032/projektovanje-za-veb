@@ -40,4 +40,16 @@ export class ObjekatService {
   getObjekatDetalji(id: number): Observable<any> {
     return this.http.get<any>(`${this.uri}/${id}`);
   }
+
+  getObjektiZaZaposlenog(korisnickoIme: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.uri}/zaposleni?korisnickoIme=${korisnickoIme}`);
+  }
+
+  dodajObjekat(dto: any, korisnickoIme: string): Observable<any> {
+    return this.http.post<any>(`${this.uri}?korisnickoIme=${korisnickoIme}`, dto);
+  }
+
+  azurirajObjekat(id: number, dto: any): Observable<any> {
+    return this.http.put<any>(`${this.uri}/${id}`, dto);
+  }
 }

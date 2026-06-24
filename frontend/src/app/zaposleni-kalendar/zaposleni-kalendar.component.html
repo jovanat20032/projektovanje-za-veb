@@ -1,0 +1,50 @@
+<div class="kalendar-container">
+  <h2>Interaktivni Kalendar</h2>
+
+  <div class="selekcija">
+    <div class="form-group">
+      <label for="objekatSelect">Izaberite objekat:</label>
+      <select id="objekatSelect" [(ngModel)]="selektovaniObjekatId" (change)="onObjekatChange()" class="form-control">
+        <option [ngValue]="null">-- Odaberite objekat --</option>
+        <option *ngFor="let obj of objekti" [value]="obj.id">{{ obj.naziv }}</option>
+      </select>
+    </div>
+
+    <div class="form-group" *ngIf="tereni.length > 0">
+      <label for="terenSelect">Izaberite teren/halu:</label>
+      <select id="terenSelect" [(ngModel)]="selektovaniTerenId" (change)="onTerenChange()" class="form-control">
+        <option [ngValue]="null">-- Odaberite teren --</option>
+        <option *ngFor="let t of tereni" [value]="t.id">{{ t.naziv }} ({{ t.tip }})</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="info-alert" *ngIf="selektovaniTerenId && !calendarOptions.editable">
+    <p>Napomena: Teren nije "Zatvorena hala/dvorana". Prevlačenje (drag-and-drop) nije dozvoljeno.</p>
+  </div>
+  <div class="success-alert" *ngIf="selektovaniTerenId && calendarOptions.editable">
+    <p>Napomena: Možete prevući događaj kako biste mu promenili vreme (drag-and-drop).</p>
+  </div>
+
+  <div class="calendar-wrapper" *ngIf="selektovaniTerenId">
+    <full-calendar [options]="calendarOptions"></full-calendar>
+    
+    <div class="legenda">
+      <div class="legenda-item">
+        <span class="boja slobodno"></span>
+        <span>Slobodno</span>
+      </div>
+      <div class="legenda-item">
+        <span class="boja rezervisano"></span>
+        <span>Rezervisano</span>
+      </div>
+      <div class="legenda-item">
+        <span class="boja trening"></span>
+        <span>Trening</span>
+      </div>
+    </div>
+    <div class="napomena-slika">
+      Napomena: Prikaz je informativnog karaktera. Za detalje rezervacije koristite sistem.
+    </div>
+  </div>
+</div>

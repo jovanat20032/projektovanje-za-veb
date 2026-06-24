@@ -13,6 +13,12 @@ import { OglasiComponent } from './oglasi/oglasi.component';
 import { TreneriComponent } from './treneri/treneri.component';
 import { ProdavnicaComponent } from './prodavnica/prodavnica.component';
 import { StatistikaComponent } from './statistika/statistika.component';
+import { UpravljanjeObjektomComponent } from './upravljanje-objektom/upravljanje-objektom.component';
+import { ZaposleniRezervacijeComponent } from './zaposleni-rezervacije/zaposleni-rezervacije.component';
+import { ZaposleniPromocijeComponent } from './zaposleni-promocije/zaposleni-promocije.component';
+import { ZaposleniOpremaComponent } from './zaposleni-oprema/zaposleni-oprema.component';
+import { ZaposleniKalendarComponent } from './zaposleni-kalendar/zaposleni-kalendar.component';
+import { ZaposleniIzvestajiComponent } from './zaposleni-izvestaji/zaposleni-izvestaji.component';
 
 export const routes: Routes = [
     { path: "", component: PocetnaComponent },
@@ -27,5 +33,12 @@ export const routes: Routes = [
     { path: "oglasi", component: OglasiComponent },
     { path: "treneri", component: TreneriComponent },
     { path: "prodavnica", component: ProdavnicaComponent },
-    { path: "statistika", component: StatistikaComponent }
+    { path: "statistika", component: StatistikaComponent },
+    { path: "upravljanje-objektom", component: UpravljanjeObjektomComponent },
+    { path: "upravljanje-objektom/:id", component: UpravljanjeObjektomComponent },
+    { path: "upravljanje-terminima", component: ZaposleniRezervacijeComponent },
+    { path: "zaposleni-promocije", component: ZaposleniPromocijeComponent },
+    { path: "zaposleni-oprema", component: ZaposleniOpremaComponent },
+    { path: "zaposleni-kalendar", component: ZaposleniKalendarComponent },
+    { path: "zaposleni-izvestaji", component: ZaposleniIzvestajiComponent }
 ];

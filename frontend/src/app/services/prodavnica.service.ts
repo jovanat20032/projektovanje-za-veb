@@ -24,6 +24,24 @@ export class ProdavnicaService {
   }
 
   otkaziPorudzbinu(id: number): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/porudzbine/${id}/otkazi`, {});
+    return this.http.put(`${this.apiUrl}/porudzbine/${id}/otkazi`, {});
+  }
+
+  // --- Endpoints za zaposlene ---
+
+  dodajOpremu(oprema: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/oprema`, oprema);
+  }
+
+  azurirajOpremu(id: number, oprema: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/oprema/${id}`, oprema);
+  }
+
+  getSvePorudzbine(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/porudzbine/sve`);
+  }
+
+  azurirajStatusPorudzbine(id: number, status: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/porudzbine/${id}/status`, { status });
   }
 }

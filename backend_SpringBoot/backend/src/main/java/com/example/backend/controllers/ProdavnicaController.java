@@ -47,4 +47,44 @@ public class ProdavnicaController {
             return ResponseEntity.badRequest().body("{\"message\": \"Greška pri otkazivanju. Moguće da porudžbina više nije u statusu NARUČENO.\"}");
         }
     }
+
+    // --- Endpoints za zaposlene ---
+
+    @PostMapping("/oprema")
+    public ResponseEntity<?> dodajOpremu(@RequestBody Oprema oprema) {
+        boolean uspeh = prodavnicaRepo.dodajOpremu(oprema);
+        if (uspeh) {
+            return ResponseEntity.ok().body("{\"message\": \"Oprema uspesno dodata\"}");
+        } else {
+            return ResponseEntity.badRequest().body("{\"message\": \"Greska pri dodavanju opreme\"}");
+        }
+    }
+
+    @PutMapping("/oprema/{id}")
+    public ResponseEntity<?> azurirajOpremu(@PathVariable int id, @RequestBody Oprema oprema) {
+        oprema.setId(id);
+        boolean uspeh = prodavnicaRepo.azurirajOpremu(oprema);
+        if (uspeh) {
+            return ResponseEntity.ok().body("{\"message\": \"Oprema uspesno azurirana\"}");
+        } else {
+            return ResponseEntity.badRequest().body("{\"message\": \"Greska pri azuriranju opreme\"}");
+        }
+    }
+
+    @GetMapping("/porudzbine/sve")
+    public ResponseEntity<?> getSvePorudzbine() {
+        List<Porudzbina> porudzbine = prodavnicaRepo.getSvePorudzbine();
+        return ResponseEntity.ok(porudzbine);
+    }
+
+    @PutMapping("/porudzbine/{id}/status")
+    public ResponseEntity<?> azurirajStatusPorudzbine(@PathVariable int id, @RequestBody java.util.Map<String, String> body) {
+        String status = body.get("status");
+        boolean uspeh = prodavnicaRepo.azurirajStatusPorudzbine(id, status);
+        if (uspeh) {
+            return ResponseEntity.ok().body("{\"message\": \"Status porudzbine uspesno azuriran\"}");
+        } else {
+            return ResponseEntity.badRequest().body("{\"message\": \"Greska pri azuriranju statusa porudzbine\"}");
+        }
+    }
 }

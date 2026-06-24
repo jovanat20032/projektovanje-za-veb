@@ -49,6 +49,37 @@
             </td>
         </tr>
         <tr>
+            <td>Odaberite sportove (max 5):</td>
+            <td>
+                <select name="sportovi" multiple [(ngModel)]="odabraniSportovi" style="height: 100px;">
+                    @for(sport of sviSportovi; track sport.naziv) {
+                        <option [value]="sport.naziv">{{sport.naziv}}</option>
+                    }
+                </select>
+                <div class="small text-muted">Držite Ctrl (ili Cmd) za višestruki odabir.</div>
+            </td>
+        </tr>
+        <tr>
+            <td>Profilna slika:</td>
+            <td>
+                <input type="file" accept="image/*" (change)="naOdabirSlike($event)">
+                <br>
+                <span>ili</span>
+                <br>
+                <button type="button" (click)="generisiAvatar()">Generiši avatar (DiceBear)</button>
+            </td>
+        </tr>
+        @if (generisaniAvatarUrl) {
+            <tr>
+                <td>Pregled avatara:</td>
+                <td>
+                    <img [src]="generisaniAvatarUrl" alt="Avatar" width="100" height="100">
+                    <br>
+                    <button type="button" (click)="sacuvajAvatar()">Sačuvaj kao profilnu sliku</button>
+                </td>
+            </tr>
+        }
+        <tr>
             <td colspan='2'>
                 <input type='button' value='Posalji zahtev' (click)='registrujSe()'>
             </td>

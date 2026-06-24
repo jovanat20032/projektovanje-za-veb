@@ -1,72 +1,47 @@
 package com.example.backend.models;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 public class Promocija {
     private int id;
     private String naziv;
-    private String objekatNaziv;
-    private Date vaziOd;
-    private Date vaziDo;
-    private String popust;
+    private int objekatId;
 
-    public Promocija(int id, String naziv, String objekatNaziv, Date vaziOd, Date vaziDo, String popust) {
-        this.id = id;
-        this.naziv = naziv;
-        this.objekatNaziv = objekatNaziv;
-        this.vaziOd = vaziOd;
-        this.vaziDo = vaziDo;
-        this.popust = popust;
-    }
+    @com.fasterxml.jackson.annotation.JsonFormat(pattern="yyyy-MM-dd")
+    private LocalDate vaziOd;
+
+    @com.fasterxml.jackson.annotation.JsonFormat(pattern="yyyy-MM-dd")
+    private LocalDate vaziDo;
+
+    private String popust;
+    private String sport;
+
+    // Dodatno polje za front
+    private String nazivObjekta;
 
     public Promocija() {}
 
-    public int getId() {
-        return id;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public String getNaziv() { return naziv; }
+    public void setNaziv(String naziv) { this.naziv = naziv; }
 
-    public String getNaziv() {
-        return naziv;
-    }
+    public int getObjekatId() { return objekatId; }
+    public void setObjekatId(int objekatId) { this.objekatId = objekatId; }
 
-    public void setNaziv(String naziv) {
-        this.naziv = naziv;
-    }
+    public LocalDate getVaziOd() { return vaziOd; }
+    public void setVaziOd(LocalDate vaziOd) { this.vaziOd = vaziOd; }
 
-    public String getObjekatNaziv() {
-        return objekatNaziv;
-    }
+    public LocalDate getVaziDo() { return vaziDo; }
+    public void setVaziDo(LocalDate vaziDo) { this.vaziDo = vaziDo; }
 
-    public void setObjekatNaziv(String objekatNaziv) {
-        this.objekatNaziv = objekatNaziv;
-    }
+    public String getPopust() { return popust; }
+    public void setPopust(String popust) { this.popust = popust; }
 
-    public Date getVaziOd() {
-        return vaziOd;
-    }
+    public String getSport() { return sport; }
+    public void setSport(String sport) { this.sport = sport; }
 
-    public void setVaziOd(Date vaziOd) {
-        this.vaziOd = vaziOd;
-    }
-
-    public Date getVaziDo() {
-        return vaziDo;
-    }
-
-    public void setVaziDo(Date vaziDo) {
-        this.vaziDo = vaziDo;
-    }
-
-    public String getPopust() {
-        return popust;
-    }
-
-    public void setPopust(String popust) {
-        this.popust = popust;
-    }
-    
+    public String getNazivObjekta() { return nazivObjekta; }
+    public void setNazivObjekta(String nazivObjekta) { this.nazivObjekta = nazivObjekta; }
 }

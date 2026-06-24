@@ -129,14 +129,14 @@ public class ObjekatRepo implements ObjekatRepoInterface{
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                promocije.add(new Promocija(
-                    rs.getInt("id"),
-                    rs.getString("naziv"),
-                    rs.getString("objekat_naziv"),
-                    rs.getDate("vazi_od"),
-                    rs.getDate("vazi_do"),
-                    rs.getString("popust")
-                ));
+                Promocija p = new Promocija();
+                p.setId(rs.getInt("id"));
+                p.setNaziv(rs.getString("naziv"));
+                p.setNazivObjekta(rs.getString("objekat_naziv"));
+                if (rs.getDate("vazi_od") != null) p.setVaziOd(rs.getDate("vazi_od").toLocalDate());
+                if (rs.getDate("vazi_do") != null) p.setVaziDo(rs.getDate("vazi_do").toLocalDate());
+                p.setPopust(rs.getString("popust"));
+                promocije.add(p);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -280,6 +280,144 @@ public class ObjekatRepo implements ObjekatRepoInterface{
                     }
                 }
             }
+        }
+        return false;
+    }
+
+    public List<com.example.backend.models.ZaposleniObjekatDTO> dohvatiObjekteZaZaposlenog(String korisnickoIme) {
+        List<com.example.backend.models.ZaposleniObjekatDTO> rezultati = new ArrayList<>();
+        String sql = "SELECT o.id, o.naziv, o.grad " +
+                     "FROM objekti o " +
+                     "JOIN zaposleni_objekat zo ON o.id = zo.objekat_id " +
+                     "WHERE zo.korisnicko_ime = ?";
+                     
+        try (Connection conn = DB.source().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             
+            stmt.setString(1, korisnickoIme);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                com.example.backend.models.ZaposleniObjekatDTO dto = new com.example.backend.models.ZaposleniObjekatDTO();
+                dto.setId(rs.getInt("id"));
+                dto.setNaziv(rs.getString("naziv"));
+                dto.setGrad(rs.getString("grad"));
+                
+                List<String> sportovi = new ArrayList<>();
+                String sqlSportovi = "SELECT s.naziv FROM sportovi s JOIN objekat_sport os ON s.id = os.sport_id WHERE os.objekat_id = ?";
+                try (PreparedStatement stSport = conn.prepareStatement(sqlSportovi)) {
+                    stSport.setInt(1, dto.getId());
+                    ResultSet rsSport = stSport.executeQuery();
+                    while (rsSport.next()) {
+                        sportovi.add(rsSport.getString("naziv"));
+                    }
+                }
+                dto.setVrsteSportova(sportovi);
+                
+                List<String> tereni = new ArrayList<>();
+                String sqlTereni = "SELECT naziv, tip, kapacitet FROM tereni WHERE objekat_id = ?";
+                try (PreparedStatement stTeren = conn.prepareStatement(sqlTereni)) {
+                    stTeren.setInt(1, dto.getId());
+                    ResultSet rsTeren = stTeren.executeQuery();
+                    while (rsTeren.next()) {
+                        tereni.add(rsTeren.getString("naziv") + " (" + rsTeren.getString("tip") + ", Kapacitet: " + rsTeren.getInt("kapacitet") + ")");
+                    }
+                }
+                dto.setElementi(tereni);
+                
+                rezultati.add(dto);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rezultati;
+    }
+
+    public int dodajObjekat(com.example.backend.models.ObjekatCreateDTO dto, String korisnickoIme) {
+        String sql = "INSERT INTO objekti (naziv, grad, adresa, maticni_broj, pib, cena_po_satu, radno_vreme, dozvoljeni_minusi, lajkovi, dislajkovi, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 'ODOBREN')";
+        int objekatId = -1;
+        try (Connection conn = DB.source().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, dto.getNaziv());
+            stmt.setString(2, dto.getGrad());
+            stmt.setString(3, dto.getAdresa());
+            stmt.setString(4, dto.getMaticniBroj());
+            stmt.setString(5, dto.getPib());
+            stmt.setDouble(6, dto.getCenaPoSatu());
+            stmt.setString(7, dto.getRadnoVreme());
+            stmt.setInt(8, dto.getDozvoljeniMinusi());
+            
+            stmt.executeUpdate();
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                objekatId = rs.getInt(1);
+            }
+            
+            if (objekatId != -1 && korisnickoIme != null && !korisnickoIme.isEmpty()) {
+                String linkSql = "INSERT INTO zaposleni_objekat (korisnicko_ime, objekat_id) VALUES (?, ?)";
+                try (PreparedStatement linkStmt = conn.prepareStatement(linkSql)) {
+                    linkStmt.setString(1, korisnickoIme);
+                    linkStmt.setInt(2, objekatId);
+                    linkStmt.executeUpdate();
+                }
+            }
+
+            if (objekatId != -1 && dto.getVrsteSportova() != null) {
+                String sqlSport = "INSERT INTO objekat_sport (objekat_id, sport_id) VALUES (?, (SELECT id FROM sportovi WHERE naziv = ?))";
+                try (PreparedStatement stmtSport = conn.prepareStatement(sqlSport)) {
+                    for (String sport : dto.getVrsteSportova()) {
+                        stmtSport.setInt(1, objekatId);
+                        stmtSport.setString(2, sport);
+                        stmtSport.executeUpdate();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return objekatId;
+    }
+
+    public boolean azurirajObjekat(int id, com.example.backend.models.ObjekatCreateDTO dto) {
+        String sql = "UPDATE objekti SET naziv = ?, grad = ?, adresa = ?, maticni_broj = ?, pib = ?, cena_po_satu = ?, radno_vreme = ?, dozvoljeni_minusi = ? WHERE id = ?";
+        try (Connection conn = DB.source().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, dto.getNaziv());
+            stmt.setString(2, dto.getGrad());
+            stmt.setString(3, dto.getAdresa());
+            stmt.setString(4, dto.getMaticniBroj());
+            stmt.setString(5, dto.getPib());
+            stmt.setDouble(6, dto.getCenaPoSatu());
+            stmt.setString(7, dto.getRadnoVreme());
+            stmt.setInt(8, dto.getDozvoljeniMinusi());
+            stmt.setInt(9, id);
+            
+            int affected = stmt.executeUpdate();
+            
+            if (affected > 0) {
+                // Obriši stare sportove
+                String delSport = "DELETE FROM objekat_sport WHERE objekat_id = ?";
+                try (PreparedStatement stmtDel = conn.prepareStatement(delSport)) {
+                    stmtDel.setInt(1, id);
+                    stmtDel.executeUpdate();
+                }
+
+                // Unesi nove
+                if (dto.getVrsteSportova() != null) {
+                    String sqlSport = "INSERT INTO objekat_sport (objekat_id, sport_id) VALUES (?, (SELECT id FROM sportovi WHERE naziv = ?))";
+                    try (PreparedStatement stmtSport = conn.prepareStatement(sqlSport)) {
+                        for (String sport : dto.getVrsteSportova()) {
+                            stmtSport.setInt(1, id);
+                            stmtSport.setString(2, sport);
+                            stmtSport.executeUpdate();
+                        }
+                    }
+                }
+            }
+            
+            return affected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return false;
     }

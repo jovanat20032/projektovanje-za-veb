@@ -22,8 +22,8 @@ export class KorisnikService {
     return this.http.post<any>(`${this.uri}/login`, data);
   }
 
-  register(korisnik: Korisnik): Observable<any> {
-    return this.http.post(`${this.uri}/register`, korisnik);
+  register(data: FormData): Observable<any> {
+    return this.http.post(`${this.uri}/register`, data);
   }
 
   zahtevZaReset(unos: string) {
@@ -38,8 +38,8 @@ export class KorisnikService {
     return this.http.get<Korisnik>(`${this.uri}/dohvatiKorisnika?korisnickoIme=${korisnickoIme}`);
   }
 
-  azurirajProfil(korisnik: Korisnik): Observable<any> {
-    return this.http.post(`${this.uri}/azurirajProfil`, korisnik, { responseType: 'text' });
+  azurirajProfil(data: FormData): Observable<any> {
+    return this.http.post(`${this.uri}/azurirajProfil`, data, { responseType: 'text' });
   }
 
   dohvatiSveSportove(): Observable<Sport[]> {

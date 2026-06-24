@@ -1,0 +1,135 @@
+<div class="container mt-5 mb-5">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h4 class="mb-0">{{ objekatId ? 'Ažuriranje objekta' : 'Dodavanje novog objekta' }}</h4>
+          <a routerLink="/profil" class="btn btn-outline-light btn-sm">Nazad</a>
+        </div>
+        <div class="card-body">
+          <div *ngIf="poruka" class="alert alert-success">{{ poruka }}</div>
+          <div *ngIf="porukaGreska" class="alert alert-danger">{{ porukaGreska }}</div>
+
+          <div class="mb-4" *ngIf="!objekatId">
+            <label class="form-label fw-bold">Učitaj iz JSON fajla</label>
+            <input type="file" class="form-control" accept=".json" (change)="onFileSelected($event)">
+            <small class="text-muted">Opcijalno: Učitajte podatke o objektu i terenima direktno iz fajla.</small>
+          </div>
+
+          <form (ngSubmit)="sacuvaj()" #objekatForm="ngForm">
+            <h5 class="border-bottom pb-2 mb-3">Osnovni podaci</h5>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Naziv objekta *</label>
+                <input type="text" class="form-control" name="naziv" [(ngModel)]="dto.naziv" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Grad *</label>
+                <input type="text" class="form-control" name="grad" [(ngModel)]="dto.grad" required>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Adresa *</label>
+              <input type="text" class="form-control" name="adresa" [(ngModel)]="dto.adresa" required>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Matični broj</label>
+                <input type="text" class="form-control" name="maticniBroj" [(ngModel)]="dto.maticniBroj">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">PIB</label>
+                <input type="text" class="form-control" name="pib" [(ngModel)]="dto.pib">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Cena po satu (RSD) *</label>
+                <input type="number" class="form-control" name="cenaPoSatu" [(ngModel)]="dto.cenaPoSatu" required min="0">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Radno vreme *</label>
+                <input type="text" class="form-control" name="radnoVreme" [(ngModel)]="dto.radnoVreme" placeholder="08:00 - 23:00" required>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Dozvoljeni minusi *</label>
+                <input type="number" class="form-control" name="dozvoljeniMinusi" [(ngModel)]="dto.dozvoljeniMinusi" required min="0">
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Vrste sportova</label>
+              <select multiple class="form-control" name="vrsteSportova" [(ngModel)]="dto.vrsteSportova" style="height: 120px;">
+                <option *ngFor="let sport of sviSportovi" [value]="sport.naziv">{{ sport.naziv }}</option>
+              </select>
+              <small class="text-muted">Držite CTRL/CMD za višestruki odabir.</small>
+            </div>
+
+            <h5 class="border-bottom pb-2 mb-3 mt-4">Tereni, hale i dvorane</h5>
+            
+            <div class="p-3 bg-light rounded border mb-4">
+              <h6 class="mb-3">Dodaj novi element</h6>
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">Naziv</label>
+                  <input type="text" class="form-control form-control-sm" name="noviTerenNaziv" [(ngModel)]="noviTeren.naziv">
+                </div>
+                <div class="col-md-3 mb-2">
+                  <label class="form-label small">Tip</label>
+                  <select class="form-select form-select-sm" name="noviTerenTip" [(ngModel)]="noviTeren.tip">
+                    <option value="OTVORENI">Otvoreni teren</option>
+                    <option value="ZATVORENI">Zatvoreni teren</option>
+                  </select>
+                </div>
+                <div class="col-md-3 mb-2">
+                  <label class="form-label small">Kapacitet</label>
+                  <input type="number" class="form-control form-control-sm" name="noviTerenKapacitet" [(ngModel)]="noviTeren.kapacitet" min="1">
+                </div>
+              </div>
+              <div class="mb-2">
+                <label class="form-label small">Opis opreme (max 300 karaktera)</label>
+                <textarea class="form-control form-control-sm" name="noviTerenOpis" [(ngModel)]="noviTeren.opisOpreme" rows="2" maxlength="300"></textarea>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" (click)="dodajTeren()">Dodaj u listu</button>
+            </div>
+
+            <div *ngIf="dto.tereni.length > 0">
+              <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                  <tr>
+                    <th>Naziv</th>
+                    <th>Tip</th>
+                    <th>Kapacitet</th>
+                    <th>Oprema</th>
+                    <th>Akcija</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let t of dto.tereni; let i = index">
+                    <td>{{ t.naziv }}</td>
+                    <td>{{ t.tip }}</td>
+                    <td>{{ t.kapacitet }}</td>
+                    <td class="text-truncate" style="max-width: 150px;" [title]="t.opisOpreme">{{ t.opisOpreme }}</td>
+                    <td>
+                      <button type="button" class="btn btn-danger btn-sm" (click)="obrisiTeren(i)">Obriši</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div *ngIf="dto.tereni.length === 0" class="text-muted small mb-3">
+              Nema dodatih terena.
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mt-3" [disabled]="!objekatForm.valid">
+              {{ objekatId ? 'Sačuvaj izmene' : 'Kreiraj objekat' }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

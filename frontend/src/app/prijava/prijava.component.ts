@@ -32,7 +32,7 @@ export class PrijavaComponent {
           if (odgovorSaBekenda.uloga == "ADMIN") {
             this.router.navigate(['admin-dashboard']);
           } else if (odgovorSaBekenda.uloga == "ZAPOSLENI") {
-            this.router.navigate(['zaposleni-kalendar']);
+            this.router.navigate(['profil']);
           } else {
             this.router.navigate(['profil']);
           }

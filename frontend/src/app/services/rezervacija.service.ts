@@ -17,4 +17,16 @@ export class RezervacijaService {
   dodajRezervaciju(rezervacija: Rezervacija): Observable<any> {
     return this.http.post<any>(`${this.uri}`, rezervacija);
   }
+
+  getRezervacijeZaZaposlenog(korisnickoIme: string): Observable<Rezervacija[]> {
+    return this.http.get<Rezervacija[]>(`${this.uri}/zaposleni/${korisnickoIme}`);
+  }
+
+  azurirajStatusRezervacije(id: number, status: string): Observable<any> {
+    return this.http.put<any>(`${this.uri}/${id}/status`, { status });
+  }
+
+  pomeriRezervaciju(id: number, vremeOd: string, vremeDo: string): Observable<any> {
+    return this.http.put<any>(`${this.uri}/${id}/pomeri`, { vremeOd, vremeDo });
+  }
 }

@@ -22,4 +22,20 @@ export class TrenerService {
   getTreninziZaSportistu(korisnickoIme: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/sportista/${korisnickoIme}`);
   }
+
+  getTreninziZaZaposlenog(korisnickoIme: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/zaposleni/${korisnickoIme}/treninzi`);
+  }
+
+  azurirajStatusTreninga(id: number, status: string): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/treninzi/${id}/status`, { status });
+  }
+
+  getTreninziZaTeren(terenId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/teren/${terenId}`);
+  }
+
+  pomeriTrening(id: number, novoVreme: string): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}/pomeri`, { novoVreme });
+  }
 }

@@ -221,4 +221,74 @@ public class ProdavnicaRepo {
             }
         }
     }
+
+    // --- Upravljanje opremom (za zaposlene) ---
+
+    public boolean dodajOpremu(Oprema o) {
+        String sql = "INSERT INTO oprema (sport, naziv, cena, zaliha, slika) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DB.source().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, o.getSport());
+            stmt.setString(2, o.getNaziv());
+            stmt.setDouble(3, o.getCena());
+            stmt.setInt(4, o.getZaliha());
+            stmt.setString(5, o.getSlika());
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean azurirajOpremu(Oprema o) {
+        String sql = "UPDATE oprema SET sport=?, naziv=?, cena=?, zaliha=?, slika=? WHERE id=?";
+        try (Connection conn = DB.source().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, o.getSport());
+            stmt.setString(2, o.getNaziv());
+            stmt.setDouble(3, o.getCena());
+            stmt.setInt(4, o.getZaliha());
+            stmt.setString(5, o.getSlika());
+            stmt.setInt(6, o.getId());
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<Porudzbina> getSvePorudzbine() {
+        List<Porudzbina> porudzbine = new ArrayList<>();
+        String sql = "SELECT * FROM porudzbine ORDER BY datum_vreme DESC";
+        try (Connection conn = DB.source().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Porudzbina p = new Porudzbina();
+                p.setId(rs.getInt("id"));
+                p.setKorisnickoIme(rs.getString("korisnicko_ime"));
+                p.setDatumVreme(rs.getTimestamp("datum_vreme").toLocalDateTime());
+                p.setStatus(rs.getString("status"));
+                p.setUkupnaCena(rs.getDouble("ukupna_cena"));
+                p.setStavke(getStavkeZaPorudzbinu(p.getId()));
+                porudzbine.add(p);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return porudzbine;
+    }
+
+    public boolean azurirajStatusPorudzbine(int id, String status) {
+        String sql = "UPDATE porudzbine SET status = ? WHERE id = ?";
+        try (Connection conn = DB.source().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, status);
+            stmt.setInt(2, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

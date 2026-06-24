@@ -6,12 +6,31 @@ public class Rezervacija {
     private int id;
     private String korisnickoIme;
     private int terenId;
+    
+    @com.fasterxml.jackson.annotation.JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime vremeOd;
+    
+    @com.fasterxml.jackson.annotation.JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime vremeDo;
+    
     private String status;
     private String sport;
 
+    // Dodatna polja za frontend
+    private String korisnikIme;
+    private String nazivTerena;
+    private String nazivObjekta;
+
     public Rezervacija() {}
+
+    public String getKorisnikIme() { return korisnikIme; }
+    public void setKorisnikIme(String korisnikIme) { this.korisnikIme = korisnikIme; }
+
+    public String getNazivTerena() { return nazivTerena; }
+    public void setNazivTerena(String nazivTerena) { this.nazivTerena = nazivTerena; }
+
+    public String getNazivObjekta() { return nazivObjekta; }
+    public void setNazivObjekta(String nazivObjekta) { this.nazivObjekta = nazivObjekta; }
 
 
     public Rezervacija(int id, String korisnickoIme, int terenId, LocalDateTime vremeOd, LocalDateTime vremeDo,

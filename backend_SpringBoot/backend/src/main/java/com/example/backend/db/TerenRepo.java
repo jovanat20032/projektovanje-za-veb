@@ -26,4 +26,30 @@ public class TerenRepo implements TerenRepoInterface{
         } catch (SQLException e) { e.printStackTrace(); }
         return tereni;
     }
+
+    public void dodajTeren(Teren t, int objekatId) {
+        String sql = "INSERT INTO tereni (objekat_id, naziv, tip, kapacitet, opis_opreme) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DB.source().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, objekatId);
+            stmt.setString(2, t.getNaziv());
+            stmt.setString(3, t.getTip());
+            stmt.setInt(4, t.getKapacitet());
+            stmt.setString(5, t.getOpisOpreme());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void obrisiTereneZaObjekat(int objekatId) {
+        String sql = "DELETE FROM tereni WHERE objekat_id = ?";
+        try (Connection conn = DB.source().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, objekatId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

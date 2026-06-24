@@ -1,0 +1,91 @@
+<div class="container mt-5">
+  <nav class="mb-4">
+    <a routerLink="/profil" class="btn btn-outline-primary me-2">Profil</a>
+    <a routerLink="/upravljanje-terminima" class="btn btn-primary me-2">Upravljanje terminima</a>
+  </nav>
+
+  <h3 class="mb-4">Rezervacije terena</h3>
+  <table class="table table-bordered table-striped text-center align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>Korisnik</th>
+        <th>Objekat / Teren</th>
+        <th>Sport</th>
+        <th>Termin</th>
+        <th>Status</th>
+        <th>Akcija</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (r of rezervacije; track r.id) {
+        <tr>
+          <td>{{ r.korisnikIme }} ({{ r.korisnickoIme }})</td>
+          <td>{{ r.nazivObjekta }} - {{ r.nazivTerena }}</td>
+          <td>{{ r.sport }}</td>
+          <td>
+            {{ r.vremeOd | date:'dd.MM.yyyy. HH:mm' }} - 
+            {{ r.vremeDo | date:'HH:mm' }}
+          </td>
+          <td>
+            <span class="badge bg-secondary" *ngIf="r.status === 'AKTIVNA'">AKTIVNA</span>
+            <span class="badge bg-success" *ngIf="r.status === 'POTVRDJENA'">POTVRĐENA</span>
+            <span class="badge bg-danger" *ngIf="r.status === 'NIJE_DOSAO'">NIJE DOŠAO</span>
+            <span class="badge bg-dark" *ngIf="r.status === 'OTKAZANA'">OTKAZANA</span>
+          </td>
+          <td>
+            @if (isActionVisible(r.vremeOd, r.status)) {
+              <button class="btn btn-success btn-sm me-2" (click)="potvrdiRezervaciju(r.id)">Potvrdi</button>
+              <button class="btn btn-danger btn-sm" (click)="odjaviRezervaciju(r.id)">Odjavi</button>
+            } @else {
+              <span class="text-muted small">Nema dostupnih akcija</span>
+            }
+          </td>
+        </tr>
+      }
+      @if (rezervacije.length === 0) {
+        <tr><td colspan="6" class="text-muted">Nema rezervacija terena.</td></tr>
+      }
+    </tbody>
+  </table>
+
+  <h3 class="mb-4 mt-5">Individualni treninzi</h3>
+  <table class="table table-bordered table-striped text-center align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>Sportista</th>
+        <th>Trener</th>
+        <th>Sport</th>
+        <th>Termin</th>
+        <th>Status</th>
+        <th>Akcija</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (t of treninzi; track t.id) {
+        <tr>
+          <td>{{ t.sportistaKorisnickoIme }}</td>
+          <td>{{ t.trenerIme }} ({{ t.trenerKorisnickoIme }})</td>
+          <td>{{ t.sport }}</td>
+          <td>{{ t.datumVreme | date:'dd.MM.yyyy. HH:mm' }}</td>
+          <td>
+            <span class="badge bg-secondary" *ngIf="t.status === 'ZAKAZAN'">ZAKAZAN</span>
+            <span class="badge bg-success" *ngIf="t.status === 'ODRZAN'">ODRŽAN</span>
+            <span class="badge bg-danger" *ngIf="t.status === 'NIJE_DOSAO'">NIJE DOŠAO</span>
+            <span class="badge bg-dark" *ngIf="t.status === 'OTKAZAN'">OTKAZAN</span>
+          </td>
+          <td>
+            @if (isActionVisible(t.datumVreme, t.status)) {
+              <button class="btn btn-success btn-sm me-2" (click)="potvrdiTrening(t.id)">Potvrdi</button>
+              <button class="btn btn-danger btn-sm" (click)="odjaviTrening(t.id)">Odjavi</button>
+            } @else {
+              <span class="text-muted small">Nema dostupnih akcija</span>
+            }
+          </td>
+        </tr>
+      }
+      @if (treninzi.length === 0) {
+        <tr><td colspan="6" class="text-muted">Nema individualnih treninga.</td></tr>
+      }
+    </tbody>
+  </table>
+</div>

@@ -196,8 +196,7 @@ export class RezervacijaDetaljiComponent implements OnInit, OnDestroy {
     let vremeOdStr = `${this.rezDatum}T${this.rezVremeOd.toString().padStart(2, '0')}:00:00`;
     let vremeDoStr = `${this.rezDatum}T${(this.rezVremeOd + 1).toString().padStart(2, '0')}:00:00`;
 
-    let userStr = localStorage.getItem('ulogovan');
-    let username = userStr ? JSON.parse(userStr).korisnickoIme : 'mina'; // fallback valid user
+    let username = localStorage.getItem('korisnickoIme') || 'mina';
 
     let rez = {
       terenId: this.trenutniTeren.id,

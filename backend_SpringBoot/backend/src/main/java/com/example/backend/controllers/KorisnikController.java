@@ -62,30 +62,64 @@ public class KorisnikController {
         return ResponseEntity.ok(odgovor);
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registracija(@RequestBody Korisnik noviKorisnik) {
-        if (korisnikRepo.findByKorisnickoIme(noviKorisnik.getKorisnickoIme()) != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Korisničko ime je zauzeto.");
-        }
+    @PostMapping(value = "/register", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> registracija(
+            @RequestPart("korisnik") String korisnikJson,
+            @RequestPart(value = "sportovi", required = false) String sportoviJson,
+            @RequestPart(value = "slika", required = false) org.springframework.web.multipart.MultipartFile slika) {
+        
+        try {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            Korisnik noviKorisnik = mapper.readValue(korisnikJson, Korisnik.class);
 
-        String enkriptovanaLozinka = passwordEncoder.encode(noviKorisnik.getLozinka());
-        noviKorisnik.setLozinka(enkriptovanaLozinka);
+            if (korisnikRepo.findByKorisnickoIme(noviKorisnik.getKorisnickoIme()) != null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Korisničko ime je zauzeto.");
+            }
 
-        noviKorisnik.setStatus("NA_CEKANJU");
+            String enkriptovanaLozinka = passwordEncoder.encode(noviKorisnik.getLozinka());
+            noviKorisnik.setLozinka(enkriptovanaLozinka);
+            noviKorisnik.setStatus("NA_CEKANJU");
 
-        boolean uspesno = korisnikRepo.save(noviKorisnik);
+            if (slika != null && !slika.isEmpty()) {
+                String fileName = java.util.UUID.randomUUID().toString() + "_" + slika.getOriginalFilename();
+                java.nio.file.Path uploadPath = java.nio.file.Paths.get("uploads");
+                if (!java.nio.file.Files.exists(uploadPath)) {
+                    java.nio.file.Files.createDirectories(uploadPath);
+                }
+                java.nio.file.Path filePath = uploadPath.resolve(fileName);
+                java.nio.file.Files.copy(slika.getInputStream(), filePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                noviKorisnik.setProfilnaSlika(fileName);
+            } else {
+                noviKorisnik.setProfilnaSlika("default_avatar.png");
+            }
 
-        if (uspesno) {
-            String token = JwtUtil.generateToken(noviKorisnik.getKorisnickoIme(), noviKorisnik.getUloga());
-            
-            Map<String, Object> odgovor = new HashMap<>();
-            odgovor.put("token", token);
-            odgovor.put("korisnickoIme", noviKorisnik.getKorisnickoIme());
-            odgovor.put("uloga", noviKorisnik.getUloga());
-            
-            return ResponseEntity.ok(odgovor);
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Greška pri čuvanju u bazu.");
+            boolean uspesno = korisnikRepo.save(noviKorisnik);
+
+            if (uspesno) {
+                if (sportoviJson != null && !sportoviJson.isEmpty()) {
+                    List<String> sportovi = mapper.readValue(sportoviJson, mapper.getTypeFactory().constructCollectionType(List.class, String.class));
+                    if (sportovi != null && !sportovi.isEmpty()) {
+                        if (sportovi.size() > 5) {
+                            sportovi = sportovi.subList(0, 5);
+                        }
+                        korisnikRepo.azurirajOmiljeneSportove(noviKorisnik.getKorisnickoIme(), sportovi);
+                    }
+                }
+
+                String token = JwtUtil.generateToken(noviKorisnik.getKorisnickoIme(), noviKorisnik.getUloga());
+                
+                Map<String, Object> odgovor = new HashMap<>();
+                odgovor.put("token", token);
+                odgovor.put("korisnickoIme", noviKorisnik.getKorisnickoIme());
+                odgovor.put("uloga", noviKorisnik.getUloga());
+                
+                return ResponseEntity.ok(odgovor);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Greška pri čuvanju u bazu.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Došlo je do greške na serveru.");
         }
     }
 
@@ -152,13 +186,35 @@ public ResponseEntity<Korisnik> dohvatiKorisnika(@RequestParam String korisnicko
     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 }
 
-    @PostMapping("/azurirajProfil")
-    public ResponseEntity<String> azurirajProfil(@RequestBody Korisnik korisnik) {
-        boolean uspesno = korisnikRepo.azurirajKorisnika(korisnik);
-        if (uspesno) {
-            return new ResponseEntity<>("Profil uspešno ažuriran", HttpStatus.OK);
+    @PostMapping(value = "/azurirajProfil", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> azurirajProfil(
+            @RequestPart("korisnik") String korisnikJson,
+            @RequestPart(value = "slika", required = false) org.springframework.web.multipart.MultipartFile slika) {
+        
+        try {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            Korisnik korisnik = mapper.readValue(korisnikJson, Korisnik.class);
+
+            if (slika != null && !slika.isEmpty()) {
+                String fileName = java.util.UUID.randomUUID().toString() + "_" + slika.getOriginalFilename();
+                java.nio.file.Path uploadPath = java.nio.file.Paths.get("uploads");
+                if (!java.nio.file.Files.exists(uploadPath)) {
+                    java.nio.file.Files.createDirectories(uploadPath);
+                }
+                java.nio.file.Path filePath = uploadPath.resolve(fileName);
+                java.nio.file.Files.copy(slika.getInputStream(), filePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                korisnik.setProfilnaSlika(fileName);
+            }
+
+            boolean uspesno = korisnikRepo.azurirajKorisnika(korisnik);
+            if (uspesno) {
+                return new ResponseEntity<>("Profil uspešno ažuriran", HttpStatus.OK);
+            }
+            return new ResponseEntity<>("Greška pri ažuriranju", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Greška na serveru", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>("Greška pri ažuriranju", HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/sviSportovi")

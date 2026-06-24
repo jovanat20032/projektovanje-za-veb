@@ -1,0 +1,77 @@
+<div class="container mt-4">
+    <h2>Upravljanje promocijama</h2>
+    
+    <div *ngIf="!prikaziFormu">
+        <button class="btn btn-primary mb-3" (click)="novaPromocija()">+ Nova promocija</button>
+        
+        <table class="table table-striped" *ngIf="promocije.length > 0">
+            <thead>
+                <tr>
+                    <th>Naziv</th>
+                    <th>Objekat</th>
+                    <th>Sport</th>
+                    <th>Vazi Od</th>
+                    <th>Vazi Do</th>
+                    <th>Popust</th>
+                    <th>Akcije</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let p of promocije">
+                    <td>{{ p.naziv }}</td>
+                    <td>{{ p.nazivObjekta }}</td>
+                    <td>{{ p.sport }}</td>
+                    <td>{{ p.vaziOd | date:'dd.MM.yyyy.' }}</td>
+                    <td>{{ p.vaziDo | date:'dd.MM.yyyy.' }}</td>
+                    <td>{{ p.popust }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary" (click)="izmeniPromociju(p)">Izmeni</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p *ngIf="promocije.length === 0" class="text-muted">Nema aktivnih promocija za vase objekte.</p>
+    </div>
+
+    <div *ngIf="prikaziFormu" class="card p-4 shadow-sm" style="max-width: 600px;">
+        <h4>{{ idPromocije ? 'Izmeni' : 'Kreiraj' }} promociju</h4>
+        
+        <div class="mb-3">
+            <label class="form-label">Naziv promocije</label>
+            <input type="text" class="form-control" [(ngModel)]="naziv">
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Objekat</label>
+            <select class="form-select" [(ngModel)]="objekatId">
+                <option *ngFor="let o of objekti" [value]="o.id">{{ o.naziv }}</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Sport</label>
+            <input type="text" class="form-control" [(ngModel)]="sport" placeholder="Npr. Tenis">
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Važi od</label>
+                <input type="date" class="form-control" [(ngModel)]="vaziOd">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Važi do</label>
+                <input type="date" class="form-control" [(ngModel)]="vaziDo">
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Popust</label>
+            <input type="text" class="form-control" [(ngModel)]="popust" placeholder="Npr. 20%">
+        </div>
+
+        <div class="mt-3">
+            <button class="btn btn-success me-2" (click)="sacuvajPromociju()">Sačuvaj</button>
+            <button class="btn btn-secondary" (click)="odustani()">Odustani</button>
+        </div>
+    </div>
+</div>

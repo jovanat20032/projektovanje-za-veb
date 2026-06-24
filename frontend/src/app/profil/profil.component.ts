@@ -9,6 +9,9 @@ import { Rezervacija } from '../models/rezervacija';
 import { TrenerService } from '../services/trener.service';
 import { ProdavnicaService } from '../services/prodavnica.service';
 
+import { ObjekatService } from '../services/objekat.service';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-profil',
   standalone: true,
@@ -20,6 +23,13 @@ export class ProfilComponent implements OnInit {
   private korisnikService = inject(KorisnikService);
   private trenerService = inject(TrenerService);
   private prodavnicaService = inject(ProdavnicaService);
+  private objekatService = inject(ObjekatService);
+  private router = inject(Router);
+
+  odjaviSe(): void {
+    localStorage.clear();
+    this.router.navigate(['/']);
+  }
 
   korisnik: Korisnik = new Korisnik();
   poruka: string = '';
@@ -31,10 +41,13 @@ export class ProfilComponent implements OnInit {
   rezervacije: Rezervacija[] = [];
   mojiTreninzi: any[] = [];
   mojePorudzbine: any[] = [];
+  
+  mojiObjekti: any[] = [];
+  uloga: string = '';
 
   ngOnInit(): void {
     const ulogovan = localStorage.getItem('korisnickoIme'); 
-    console.log("ULOGOVAN KORISNIK IZ LOCALSTORAGE JE:", ulogovan);
+    this.uloga = localStorage.getItem('uloga') || '';
     
     if (ulogovan) {
       this.korisnikService.dohvatiKorisnika(ulogovan).subscribe({
@@ -45,6 +58,14 @@ export class ProfilComponent implements OnInit {
           console.error("Greška pri dohvatanju podataka", err);
         }
       });
+      
+      if (this.uloga === 'ZAPOSLENI') {
+        this.objekatService.getObjektiZaZaposlenog(ulogovan).subscribe({
+          next: (objekti) => this.mojiObjekti = objekti,
+          error: (err) => console.error("Greška pri dohvatanju objekata", err)
+        });
+      }
+
       this.korisnikService.dohvatiSveSportove().subscribe({
         next: (sportovi) => {
           console.log("3. SVI SPORTOVI SA BEKENDA:", sportovi);
@@ -100,7 +121,12 @@ export class ProfilComponent implements OnInit {
   }
 
   azuriraj(): void {
-    this.korisnikService.azurirajProfil(this.korisnik).subscribe({
+    const formData = new FormData();
+    formData.append("korisnik", JSON.stringify(this.korisnik));
+    if (this.novaSlikaFajl) {
+      formData.append("slika", this.novaSlikaFajl);
+    }
+    this.korisnikService.azurirajProfil(formData).subscribe({
       next: (odgovor) => {
         this.poruka = 'Podaci su uspešno ažurirani!';
       },
@@ -175,5 +201,26 @@ export class ProfilComponent implements OnInit {
       if (vrednostA > vrednostB) return this.trenutnoSortiranje.rastuce ? 1 : -1;
       return 0;
     });
+  }
+
+  naGreskuSlike(event: any) {
+    if (!event.target.src.endsWith('default_avatar.png')) {
+      event.target.src = 'http://localhost:8080/uploads/default_avatar.png';
+    }
+  }
+
+  novaSlikaFajl: File | null = null;
+
+  naOdabirSlike(event: any) {
+    const fajl = event.target.files[0];
+    if (fajl) {
+      this.novaSlikaFajl = fajl;
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        const img = document.querySelector('img[alt="Profilna slika"]') as HTMLImageElement;
+        if (img) img.src = e.target.result;
+      };
+      reader.readAsDataURL(fajl);
+    }
   }
 }
