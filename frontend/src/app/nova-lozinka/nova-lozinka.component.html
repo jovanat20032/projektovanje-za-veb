@@ -1,20 +1,30 @@
-<h2>Postavljanje nove lozinke</h2>
-<hr />
-
-<table>
-    <tr>
-        <td>Nova lozinka:</td>
-        <td><input type="password" [(ngModel)]="novaLozinka"></td>
-    </tr>
-    <tr>
-        <td>Potvrdite lozinku:</td>
-        <td><input type="password" [(ngModel)]="potvrdaLozinke"></td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <button (click)="promeniLozinku()">Sačuvaj lozinku</button>
-        </td>
-    </tr>
-</table>
-
-<span style="color: red">{{ poruka }}</span>
+<div class="form-container">
+  <h2>Postavljanje nove lozinke</h2>
+  <hr />
+  <form #novaLozinkaForm="ngForm" (ngSubmit)="promeniLozinku()">
+      <div class="form-group">
+          <label for="novaLozinka">Nova lozinka:</label>
+          <input type="password" id="novaLozinka" name="novaLozinka" class="form-control"
+                 [(ngModel)]="novaLozinka" required minlength="6" #novaLozinkaInput="ngModel">
+          <span class="text-danger" *ngIf="novaLozinkaInput.invalid && (novaLozinkaInput.dirty || novaLozinkaInput.touched)">
+              <span *ngIf="novaLozinkaInput.errors?.['required']">Lozinka je obavezna.</span>
+              <span *ngIf="novaLozinkaInput.errors?.['minlength']">Lozinka mora imati barem 6 karaktera.</span>
+          </span>
+      </div>
+      
+      <div class="form-group">
+          <label for="potvrdaLozinke">Potvrdite lozinku:</label>
+          <input type="password" id="potvrdaLozinke" name="potvrdaLozinke" class="form-control"
+                 [(ngModel)]="potvrdaLozinke" required #potvrdaLozinkeInput="ngModel">
+          <span class="text-danger" *ngIf="potvrdaLozinkeInput.invalid && (potvrdaLozinkeInput.dirty || potvrdaLozinkeInput.touched)">
+              Potvrda lozinke je obavezna.
+          </span>
+      </div>
+      
+      <div class="form-group">
+          <button type="submit" class="btn btn-primary" [disabled]="novaLozinkaForm.invalid">Sačuvaj lozinku</button>
+      </div>
+      
+      <span class="text-danger" *ngIf="poruka">{{ poruka }}</span>
+  </form>
+</div>

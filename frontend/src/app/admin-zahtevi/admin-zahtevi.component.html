@@ -1,0 +1,77 @@
+<div class="container mt-5">
+  <div class="mb-3">
+    <a routerLink="/admin-dashboard" class="btn btn-secondary">&larr; Nazad na panel</a>
+  </div>
+  
+  <h2 class="mb-4">Zahtevi za odobrenje</h2>
+
+  <div class="card mb-5 shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">Registracije novih korisnika (Sportisti i Zaposleni)</h4>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Korisnicko ime</th>
+            <th>Ime i prezime</th>
+            <th>Email</th>
+            <th>Uloga</th>
+            <th class="text-center">Akcije</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let k of zahteviKorisnici">
+            <td>{{ k.korisnickoIme }}</td>
+            <td>{{ k.ime }} {{ k.prezime }}</td>
+            <td>{{ k.email }}</td>
+            <td>{{ k.uloga }}</td>
+            <td class="text-center">
+              <button class="btn btn-success btn-sm me-2" (click)="odluciOKorisniku(k.korisnickoIme, 'ODOBREN')"><i class="bi bi-check-lg"></i> Odobri</button>
+              <button class="btn btn-danger btn-sm" (click)="odluciOKorisniku(k.korisnickoIme, 'ODBIJEN')"><i class="bi bi-x-lg"></i> Odbij</button>
+            </td>
+          </tr>
+          <tr *ngIf="zahteviKorisnici.length === 0">
+            <td colspan="5" class="text-center text-muted py-3">Nema novih zahteva za registraciju.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-success text-white">
+      <h4 class="mb-0">Novi sportski objekti</h4>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>ID</th>
+            <th>Naziv objekta</th>
+            <th>Grad</th>
+            <th>Adresa</th>
+            <th>Matični broj</th>
+            <th class="text-center">Akcije</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let o of zahteviObjekti">
+            <td>{{ o.id }}</td>
+            <td><strong>{{ o.naziv }}</strong></td>
+            <td>{{ o.grad }}</td>
+            <td>{{ o.adresa }}</td>
+            <td>{{ o.maticniBroj }}</td>
+            <td class="text-center">
+              <button class="btn btn-success btn-sm me-2" (click)="odluciOObjektu(o.id, 'ODOBREN')"><i class="bi bi-check-lg"></i> Odobri</button>
+              <button class="btn btn-danger btn-sm" (click)="odluciOObjektu(o.id, 'ODBIJEN')"><i class="bi bi-x-lg"></i> Odbij</button>
+            </td>
+          </tr>
+          <tr *ngIf="zahteviObjekti.length === 0">
+            <td colspan="6" class="text-center text-muted py-3">Nema novih objekata na čekanju.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

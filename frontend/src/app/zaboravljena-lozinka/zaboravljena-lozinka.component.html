@@ -1,21 +1,30 @@
-<h2>Zaboravljena lozinka</h2>
-<p>Unesite Vaše korisničko ime ili email adresu kako biste dobili link za promenu lozinke.</p>
-<hr />
-
-<input type="text" [(ngModel)]="unos" placeholder="Korisničko ime ili email" style="width: 250px;">
-<br><br>
-<button (click)="posaljiZahtev()">Pošalji link</button>
-
-<br><br>
-<span style="color: red">{{ poruka }}</span>
-
-@if (dobijeniLink) {
-    <div style="margin-top: 20px; padding: 15px; border: 1px dashed blue; background: #f0f8ff;">
-        <b>Simulacija prijemnog Inbox-a:</b><br><br>
-        Dobili ste novi zahtev za promenu lozinke. Kliknite na link ispod (važi 30 minuta):<br>
-        <a [href]="dobijeniLink">{{ dobijeniLink }}</a>
-    </div>
-}
-
-<br><br>
-<button click="nazadPrijava()">Nazad na prijavu</button>
+<div class="form-container">
+  <h2>Zaboravljena lozinka</h2>
+  <p>Unesite Vaše korisničko ime ili email adresu kako biste dobili link za promenu lozinke.</p>
+  <hr />
+  <form #zaboravljenaForm="ngForm" (ngSubmit)="posaljiZahtev()">
+      <div class="form-group">
+          <label for="unos">Korisničko ime ili email:</label>
+          <input type="text" id="unos" name="unos" class="form-control"
+                 [(ngModel)]="unos" required #unosInput="ngModel">
+          <span class="text-danger" *ngIf="unosInput.invalid && (unosInput.dirty || unosInput.touched)">
+              Ovo polje je obavezno.
+          </span>
+      </div>
+      
+      <div class="form-group">
+          <button type="submit" class="btn btn-primary" [disabled]="zaboravljenaForm.invalid">Pošalji link</button>
+      </div>
+      
+      <span class="text-danger" *ngIf="poruka">{{ poruka }}</span>
+      
+      <div *ngIf="dobijeniLink" style="margin-top: 20px; padding: 15px; border: 1px dashed var(--primary-color); background: #eef2f5;">
+          <b>Simulacija prijemnog Inbox-a:</b><br><br>
+          Dobili ste novi zahtev za promenu lozinke. Kliknite na link ispod (važi 30 minuta):<br>
+          <a [href]="dobijeniLink">{{ dobijeniLink }}</a>
+      </div>
+      
+      <hr>
+      <button type="button" class="btn btn-secondary btn-sm" (click)="nazadPrijava()">Nazad na prijavu</button>
+  </form>
+</div>

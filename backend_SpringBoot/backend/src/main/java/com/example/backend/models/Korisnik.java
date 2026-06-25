@@ -1,14 +1,35 @@
 package com.example.backend.models;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public class Korisnik {
+    @NotBlank(message = "Korisničko ime je obavezno")
     private String korisnickoIme;
+    
+    @NotBlank(message = "Lozinka je obavezna")
+    @Size(min = 6, message = "Lozinka mora imati barem 6 karaktera")
     private String lozinka;
+    
+    @NotBlank(message = "Ime je obavezno")
     private String ime;
+    
+    @NotBlank(message = "Prezime je obavezno")
     private String prezime;
+    
+    @NotBlank(message = "Telefon je obavezan")
     private String telefon;
+    
+    @NotBlank(message = "Email je obavezan")
+    @Email(message = "Email mora biti validan")
     private String email;
+    
     private String profilnaSlika;
+    
+    @NotBlank(message = "Uloga je obavezna")
     private String uloga;
+    
     private String status;
     public String getKorisnickoIme() {
         return korisnickoIme;

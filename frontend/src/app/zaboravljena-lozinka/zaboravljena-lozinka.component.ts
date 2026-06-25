@@ -7,7 +7,7 @@ import { KorisnikService } from '../services/korisnik.service';
 @Component({
   selector: 'app-zaboravljena-lozinka',
   standalone: true,
-  imports: [FormsModule, RouterModule],
+  imports: [FormsModule, RouterModule, CommonModule],
   templateUrl: './zaboravljena-lozinka.component.html',
   styleUrl: './zaboravljena-lozinka.component.css'
 })

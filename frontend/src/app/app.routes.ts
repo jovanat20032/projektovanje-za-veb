@@ -19,6 +19,11 @@ import { ZaposleniPromocijeComponent } from './zaposleni-promocije/zaposleni-pro
 import { ZaposleniOpremaComponent } from './zaposleni-oprema/zaposleni-oprema.component';
 import { ZaposleniKalendarComponent } from './zaposleni-kalendar/zaposleni-kalendar.component';
 import { ZaposleniIzvestajiComponent } from './zaposleni-izvestaji/zaposleni-izvestaji.component';
+import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import { AdminKorisniciComponent } from './admin-korisnici/admin-korisnici.component';
+import { AdminZahteviComponent } from './admin-zahtevi/admin-zahtevi.component';
+import { AdminTreneriComponent } from './admin-treneri/admin-treneri.component';
+import { AdminSportoviComponent } from './admin-sportovi/admin-sportovi.component';
 
 export const routes: Routes = [
     { path: "", component: PocetnaComponent },
@@ -40,5 +45,10 @@ export const routes: Routes = [
     { path: "zaposleni-promocije", component: ZaposleniPromocijeComponent },
     { path: "zaposleni-oprema", component: ZaposleniOpremaComponent },
     { path: "zaposleni-kalendar", component: ZaposleniKalendarComponent },
-    { path: "zaposleni-izvestaji", component: ZaposleniIzvestajiComponent }
+    { path: "zaposleni-izvestaji", component: ZaposleniIzvestajiComponent },
+    { path: "admin-dashboard", component: AdminDashboardComponent },
+    { path: "admin-korisnici", component: AdminKorisniciComponent },
+    { path: "admin-zahtevi", component: AdminZahteviComponent },
+    { path: "admin-treneri", component: AdminTreneriComponent },
+    { path: "admin-sportovi", component: AdminSportoviComponent }
 ];

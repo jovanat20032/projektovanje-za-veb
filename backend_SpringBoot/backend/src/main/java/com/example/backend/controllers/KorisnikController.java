@@ -11,8 +11,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.HashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import jakarta.validation.Valid;
+import com.example.backend.models.LoginDTO;
+import com.example.backend.models.ZahtevResetDTO;
+import com.example.backend.models.PromenaLozinkeDTO;
 
 @RestController
 @RequestMapping("/api/korisnici")
@@ -26,14 +31,9 @@ public class KorisnikController {
     private Map<String, Long> vremeIstekaTokena = new HashMap<>();
 
     @PostMapping("/login")
-    public ResponseEntity<?> prijava(@RequestBody Map<String, String> podaci) {
-        String korisnickoIme = podaci.get("korisnickoIme");
-        String lozinka = podaci.get("lozinka");
-
-        if (korisnickoIme == null || korisnickoIme.trim().isEmpty() || 
-            lozinka == null || lozinka.trim().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Korisnicko ime i lozinka su obavezni.");
-        }
+    public ResponseEntity<?> prijava(@Valid @RequestBody LoginDTO loginDTO) {
+        String korisnickoIme = loginDTO.getKorisnickoIme();
+        String lozinka = loginDTO.getLozinka();
 
         Korisnik korisnik = korisnikRepo.findByKorisnickoIme(korisnickoIme);
         if (korisnik == null) {
@@ -124,8 +124,8 @@ public class KorisnikController {
     }
 
     @PostMapping("/zahtev-za-reset")
-    public ResponseEntity<?> zahtevZaReset(@RequestBody Map<String, String> podaci) {
-        String unos = podaci.get("unos");
+    public ResponseEntity<?> zahtevZaReset(@Valid @RequestBody ZahtevResetDTO zahtevDTO) {
+        String unos = zahtevDTO.getUnos();
 
         Korisnik korisnik = korisnikRepo.findByKorisnickoImeIliEmail(unos);
         if (korisnik == null) {
@@ -147,9 +147,9 @@ public class KorisnikController {
     }
 
     @PostMapping("/promena-lozinke")
-    public ResponseEntity<?> promenaLozinke(@RequestBody Map<String, String> podaci) {
-        String token = podaci.get("token");
-        String novaLozinka = podaci.get("novaLozinka");
+    public ResponseEntity<?> promenaLozinke(@Valid @RequestBody PromenaLozinkeDTO promenaDTO) {
+        String token = promenaDTO.getToken();
+        String novaLozinka = promenaDTO.getNovaLozinka();
 
         if (!aktivniTokeni.containsKey(token)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ovaj link je nevalidan ili je već iskorišćen.");

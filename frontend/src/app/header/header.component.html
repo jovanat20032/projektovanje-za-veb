@@ -1,0 +1,25 @@
+<header class="app-header">
+  <div class="logo">
+    <a routerLink="/">NašSistem</a>
+  </div>
+  <nav class="nav-menu">
+    <ul>
+      <li><a routerLink="/">Početna</a></li>
+      <li *ngIf="uloga === 'ADMIN'"><a routerLink="/admin-dashboard">Admin Panel</a></li>
+      <li *ngIf="uloga === 'KLIJENT' || uloga === 'ZAPOSLENI'"><a routerLink="/profil">Profil</a></li>
+      <li *ngIf="uloga === 'KLIJENT'"><a routerLink="/oglasi">Oglasi</a></li>
+      <li *ngIf="uloga === 'KLIJENT'"><a routerLink="/prodavnica">Prodavnica</a></li>
+      <li *ngIf="uloga === 'ZAPOSLENI'"><a routerLink="/upravljanje-terminima">Rezervacije</a></li>
+      <li *ngIf="uloga === 'ZAPOSLENI'"><a routerLink="/zaposleni-promocije">Promocije</a></li>
+    </ul>
+  </nav>
+  <div class="user-actions">
+    <ng-container *ngIf="korisnickoIme; else loggedOut">
+      <span class="user-name">Dobrodošli, {{ korisnickoIme }}</span>
+      <button class="btn btn-danger btn-sm" (click)="logout()">Izloguj se</button>
+    </ng-container>
+    <ng-template #loggedOut>
+      <a class="btn btn-primary btn-sm" routerLink="/prijava">Prijavi se</a>
+    </ng-template>
+  </div>
+</header>

@@ -2,11 +2,12 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { KorisnikService } from '../services/korisnik.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-nova-lozinka',
   standalone: true,
-  imports: [FormsModule, RouterModule],
+  imports: [FormsModule, RouterModule, CommonModule],
   templateUrl: './nova-lozinka.component.html'
 })
 export class NovaLozinkaComponent implements OnInit {

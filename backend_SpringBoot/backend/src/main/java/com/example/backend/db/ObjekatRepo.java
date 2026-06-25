@@ -334,7 +334,7 @@ public class ObjekatRepo implements ObjekatRepoInterface{
     }
 
     public int dodajObjekat(com.example.backend.models.ObjekatCreateDTO dto, String korisnickoIme) {
-        String sql = "INSERT INTO objekti (naziv, grad, adresa, maticni_broj, pib, cena_po_satu, radno_vreme, dozvoljeni_minusi, lajkovi, dislajkovi, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 'ODOBREN')";
+        String sql = "INSERT INTO objekti (naziv, grad, adresa, maticni_broj, pib, cena_po_satu, radno_vreme, dozvoljeni_minusi, lajkovi, dislajkovi, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 'NA_CEKANJU')";
         int objekatId = -1;
         try (Connection conn = DB.source().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {

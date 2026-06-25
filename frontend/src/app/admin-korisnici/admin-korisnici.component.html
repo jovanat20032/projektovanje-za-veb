@@ -1,0 +1,80 @@
+<div class="container mt-5">
+  <div class="mb-3">
+    <a routerLink="/admin-dashboard" class="btn btn-secondary">&larr; Nazad na panel</a>
+  </div>
+  
+  <h2>Upravljanje Korisnicima</h2>
+
+  <table class="table table-bordered table-striped mt-4">
+    <thead class="table-dark">
+      <tr>
+        <th>Korisnicko ime</th>
+        <th>Ime i prezime</th>
+        <th>Email</th>
+        <th>Uloga</th>
+        <th>Status</th>
+        <th>Akcije</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let k of korisnici">
+        <td>{{ k.korisnickoIme }}</td>
+        <td>{{ k.ime }} {{ k.prezime }}</td>
+        <td>{{ k.email }}</td>
+        <td>{{ k.uloga }}</td>
+        <td>{{ k.status }}</td>
+        <td class="text-center">
+          <button class="btn btn-primary btn-sm me-2" (click)="izmeni(k)">Izmeni</button>
+          <button class="btn btn-danger btn-sm" (click)="obrisi(k.korisnickoIme)">Obrisi</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Forma za izmenu korisnika -->
+  <div *ngIf="izabraniKorisnik" class="card mt-5 shadow-sm p-4 border-primary">
+    <h4>Izmena korisnika: {{ izabraniKorisnik.korisnickoIme }}</h4>
+    <form (ngSubmit)="sacuvajIzmene()">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label>Ime:</label>
+          <input type="text" class="form-control" name="ime" [(ngModel)]="izabraniKorisnik.ime">
+        </div>
+        <div class="col-md-6">
+          <label>Prezime:</label>
+          <input type="text" class="form-control" name="prezime" [(ngModel)]="izabraniKorisnik.prezime">
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label>Email:</label>
+          <input type="email" class="form-control" name="email" [(ngModel)]="izabraniKorisnik.email">
+        </div>
+        <div class="col-md-6">
+          <label>Telefon:</label>
+          <input type="text" class="form-control" name="telefon" [(ngModel)]="izabraniKorisnik.telefon">
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label>Uloga:</label>
+          <select class="form-select" name="uloga" [(ngModel)]="izabraniKorisnik.uloga">
+            <option value="SPORTISTA">SPORTISTA</option>
+            <option value="ZAPOSLENI">ZAPOSLENI</option>
+            <option value="ADMIN">ADMIN</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label>Status:</label>
+          <select class="form-select" name="status" [(ngModel)]="izabraniKorisnik.status">
+            <option value="ODOBREN">ODOBREN</option>
+            <option value="NA_CEKANJU">NA_CEKANJU</option>
+            <option value="ODBIJEN">ODBIJEN</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-success me-2">Sacuvaj izmene</button>
+      <button type="button" class="btn btn-secondary" (click)="otkaziIzmene()">Otkazi</button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,39 @@
+<div class="container mt-5">
+  <div class="mb-3">
+    <a routerLink="/admin-dashboard" class="btn btn-secondary">&larr; Nazad na panel</a>
+  </div>
+  
+  <h2 class="mb-4">Evidencija trenera</h2>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <table class="table table-striped table-hover mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th>Korisnicko ime</th>
+            <th>Ime i prezime</th>
+            <th>Sport</th>
+            <th>Specijalizacija</th>
+            <th class="text-center">Akcije</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of treneri">
+            <td>{{ t.korisnickoIme }}</td>
+            <td>{{ t.ime }} {{ t.prezime }}</td>
+            <td><span class="badge bg-info text-dark">{{ t.sport }}</span></td>
+            <td>{{ t.specijalizacija }}</td>
+            <td class="text-center">
+              <button class="btn btn-warning btn-sm" (click)="deaktiviraj(t.korisnickoIme)">
+                <i class="bi bi-person-x-fill"></i> Deaktiviraj
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="treneri.length === 0">
+            <td colspan="5" class="text-center py-4 text-muted">Nema aktivnih trenera u sistemu.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
